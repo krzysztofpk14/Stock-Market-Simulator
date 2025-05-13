@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-components-impl-Latest.xsd"/>
+   <xs:group name="PayManagementReportElements">
+      <xs:sequence>
+         <xs:element name="Instrmt" type="Instrument_Block_t" minOccurs="0"/>
+         <xs:element name="ReltdTrd"
+                     type="RelatedTradeGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="PostTrdPmt" type="PostTradePayment_Block_t"/>
+         <xs:element name="SettlDetails"
+                     type="SettlDetails_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="PayManagementReportAttributes">
+      <xs:attribute name="RptID" type="PayReportID_t" use="required"/>
+      <xs:attribute name="ReqID" type="PayRequestID_t" use="optional"/>
+      <xs:attribute name="TxnTyp" type="PayReportTransType_t" use="required"/>
+      <xs:attribute name="RptRefID" type="PayReportRefID_t" use="optional"/>
+      <xs:attribute name="RplcTxt" type="ReplaceText_t" use="optional"/>
+      <xs:attribute name="EncRplcTxtLen" type="EncodedReplaceTextLen_t" use="optional"/>
+      <xs:attribute name="EncRplcTxt" type="EncodedReplaceText_t" use="optional"/>
+      <xs:attribute name="ReqStat" type="PayRequestStatus_t" use="optional"/>
+      <xs:attribute name="DsptRsn" type="PayDisputeReason_t" use="optional"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+      <xs:attribute name="BizDt" type="ClearingBusinessDate_t" use="optional"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="PayManagementReport_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">PayManagementReport can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg161</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="PayManagementReport"
+                     ComponentType="Message"
+                     MsgID="161"
+                     Section="PostTrade"
+                     Category="PayManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="PayManagementReportElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="PayManagementReportAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="PayMgmtRpt"
+               type="PayManagementReport_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="PayManagementReportAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="PayManagementReportAckAttributes">
+      <xs:attribute name="RptID" type="PayReportID_t" use="required"/>
+      <xs:attribute name="RptStat" type="PayReportStatus_t" use="required"/>
+      <xs:attribute name="DsptRsn" type="PayDisputeReason_t" use="optional"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="PayManagementReportAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">PayManagementReportAck can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg162</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="PayManagementReportAck"
+                     ComponentType="Message"
+                     MsgID="162"
+                     Section="PostTrade"
+                     Category="PayManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="PayManagementReportAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="PayManagementReportAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="PayMgmtRptAck"
+               type="PayManagementReportAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="PayManagementRequestElements">
+      <xs:sequence>
+         <xs:element name="Instrmt" type="Instrument_Block_t" minOccurs="0"/>
+         <xs:element name="ReltdTrd"
+                     type="RelatedTradeGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="PostTrdPmt" type="PostTradePayment_Block_t"/>
+         <xs:element name="SettlDetails"
+                     type="SettlDetails_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="PayManagementRequestAttributes">
+      <xs:attribute name="ReqID" type="PayRequestID_t" use="required"/>
+      <xs:attribute name="TxnTyp" type="PayRequestTransType_t" use="required"/>
+      <xs:attribute name="ReqRefID" type="PayRequestRefID_t" use="optional"/>
+      <xs:attribute name="CxlTxt" type="CancelText_t" use="optional"/>
+      <xs:attribute name="EncCxlTxtLen" type="EncodedCancelTextLen_t" use="optional"/>
+      <xs:attribute name="EncCxlTxt" type="EncodedCancelText_t" use="optional"/>
+      <xs:attribute name="BizDt" type="ClearingBusinessDate_t" use="optional"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="PayManagementRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">PayManagementRequest can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg163</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="PayManagementRequest"
+                     ComponentType="Message"
+                     MsgID="163"
+                     Section="PostTrade"
+                     Category="PayManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="PayManagementRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="PayManagementRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="PayMgmtReq"
+               type="PayManagementRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="PayManagementRequestAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="PayManagementRequestAckAttributes">
+      <xs:attribute name="ReqID" type="PayRequestID_t" use="required"/>
+      <xs:attribute name="ReqStat" type="PayRequestStatus_t" use="required"/>
+   </xs:attributeGroup>
+   <xs:complexType name="PayManagementRequestAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">PayManagementRequestAck can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg164</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="PayManagementRequestAck"
+                     ComponentType="Message"
+                     MsgID="164"
+                     Section="PostTrade"
+                     Category="PayManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="PayManagementRequestAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="PayManagementRequestAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="PayMgmtReqAck"
+               type="PayManagementRequestAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="PostTradePaymentElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="PostTradePaymentAttributes">
+      <xs:attribute name="Typ" type="PostTradePaymentType_t" use="required"/>
+      <xs:attribute name="Amt" type="PostTradePaymentAmount_t" use="required"/>
+      <xs:attribute name="Ccy" type="PostTradePaymentCurrency_t" use="optional"/>
+      <xs:attribute name="CcySrc"
+                    type="PostTradePaymentCurrencyCodeSource_t"
+                    use="optional"/>
+      <xs:attribute name="CalcDt"
+                    type="PostTradePaymentCalculationDate_t"
+                    use="required"/>
+      <xs:attribute name="ValuDt" type="PostTradePaymentValueDate_t" use="required"/>
+      <xs:attribute name="FnlValuDt"
+                    type="PostTradePaymentFinalValueDate_t"
+                    use="optional"/>
+      <xs:attribute name="DbtCrd" type="PostTradePaymentDebitOrCredit_t" use="required"/>
+      <xs:attribute name="Acct" type="PostTradePaymentAccount_t" use="required"/>
+      <xs:attribute name="ID" type="PostTradePaymentID_t" use="optional"/>
+      <xs:attribute name="Desc" type="PostTradePaymentDesc_t" use="optional"/>
+      <xs:attribute name="EncDescLen"
+                    type="EncodedPostTradePaymentDescLen_t"
+                    use="optional"/>
+      <xs:attribute name="EncDesc" type="EncodedPostTradePaymentDesc_t" use="optional"/>
+      <xs:attribute name="LinkID" type="PostTradePaymentLinkID_t" use="optional"/>
+      <xs:attribute name="Stat" type="PostTradePaymentStatus_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="PostTradePayment_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="PostTradePayment"
+                     ComponentType="Block"
+                     Category="PayManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="PostTradePaymentElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="PostTradePaymentAttributes"/>
+   </xs:complexType>
+</xs:schema>

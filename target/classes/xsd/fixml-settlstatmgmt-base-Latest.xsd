@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-components-impl-Latest.xsd"/>
+   <xs:group name="SettlementStatusRequestElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="RegTrdID"
+                     type="RegulatoryTradeIDGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="SettlTrdDetls" type="SettlTradeDetails_Block_t" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="SettlementStatusRequestAttributes">
+      <xs:attribute name="ReqID" type="SettlStatusRequestID_t" use="required"/>
+      <xs:attribute name="SubReqTyp" type="SubscriptionRequestType_t" use="required"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="SettlementStatusRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">SettlementStatusRequest can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg165</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="SettlementStatusRequest"
+                     ComponentType="Message"
+                     MsgID="165"
+                     Section="PostTrade"
+                     Category="SettlementStatusManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="SettlementStatusRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="SettlementStatusRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="SettlStatReq"
+               type="SettlementStatusRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="SettlementStatusRequestAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="SettlementStatusRequestAckAttributes">
+      <xs:attribute name="ReqID" type="SettlStatusRequestID_t" use="required"/>
+      <xs:attribute name="ReqStat" type="SettlStatusRequestStatus_t" use="required"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="SettlementStatusRequestAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">SettlementStatusRequestAck can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg166</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="SettlementStatusRequestAck"
+                     ComponentType="Message"
+                     MsgID="166"
+                     Section="PostTrade"
+                     Category="SettlementStatusManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="SettlementStatusRequestAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="SettlementStatusRequestAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="SettlStatReqAck"
+               type="SettlementStatusRequestAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="SettlementStatusReportElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="RegTrdID"
+                     type="RegulatoryTradeIDGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="SettlTrdDetls" type="SettlTradeDetails_Block_t" minOccurs="0"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="SettlementStatusReportAttributes">
+      <xs:attribute name="RptID" type="SettlStatusReportID_t" use="required"/>
+      <xs:attribute name="ReqID" type="SettlStatusRequestID_t" use="optional"/>
+      <xs:attribute name="SettlStat" type="SettlStatus_t" use="required"/>
+      <xs:attribute name="SettlStatRsn" type="SettlStatusReason_t" use="optional"/>
+      <xs:attribute name="SettlStatRsnTxt"
+                    type="SettlStatusReasonText_t"
+                    use="optional"/>
+      <xs:attribute name="EncSettlStatRsnTxtLen"
+                    type="EncodedSettlStatusReasonTextLen_t"
+                    use="optional"/>
+      <xs:attribute name="EncSettlStatRsnTxt"
+                    type="EncodedSettlStatusReasonText_t"
+                    use="optional"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="SettlementStatusReport_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">SettlementStatusReport can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg167</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="SettlementStatusReport"
+                     ComponentType="Message"
+                     MsgID="167"
+                     Section="PostTrade"
+                     Category="SettlementStatusManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="SettlementStatusReportElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="SettlementStatusReportAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="SettlStatRpt"
+               type="SettlementStatusReport_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="SettlementStatusReportAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="SettlementStatusReportAckAttributes">
+      <xs:attribute name="RptID" type="SettlStatusReportID_t" use="required"/>
+      <xs:attribute name="Stat" type="SettlStatusReportStatus_t" use="required"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="SettlementStatusReportAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">SettlementStatusReportAck can be found at https://www.fixtrading.org/online-specification/business-area-PostTrade#msg168</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="SettlementStatusReportAck"
+                     ComponentType="Message"
+                     MsgID="168"
+                     Section="PostTrade"
+                     Category="SettlementStatusManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="SettlementStatusReportAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="SettlementStatusReportAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="SettlStatRptAck"
+               type="SettlementStatusReportAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="SettlTradeDetailsElements">
+      <xs:sequence>
+         <xs:element name="Instrmt"
+                     type="Instrument_Block_t"
+                     minOccurs="0"
+                     maxOccurs="1"/>
+         <xs:element name="Pty"
+                     type="NestedParties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="SetInstr"
+                     type="SettlInstructionsData_Block_t"
+                     minOccurs="0"
+                     maxOccurs="1"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="SettlTradeDetailsAttributes">
+      <xs:attribute name="CnfmID" type="ConfirmID_t" use="optional"/>
+      <xs:attribute name="AllocID" type="AllocID_t" use="optional"/>
+      <xs:attribute name="IndAllocID" type="IndividualAllocID_t" use="optional"/>
+      <xs:attribute name="AllocID2" type="SecondaryAllocID_t" use="optional"/>
+      <xs:attribute name="Acct" type="AllocAccount_t" use="optional"/>
+      <xs:attribute name="TrdDt" type="TradeDate_t" use="optional"/>
+      <xs:attribute name="Qty" type="AllocQty_t" use="optional"/>
+      <xs:attribute name="Side" type="Side_t" use="optional"/>
+      <xs:attribute name="AvgPx" type="AvgPx_t" use="optional"/>
+      <xs:attribute name="PxTyp" type="PriceType_t" use="optional"/>
+      <xs:attribute name="AvgParPx" type="AvgParPx_t" use="optional"/>
+      <xs:attribute name="GrossTrdAmt" type="GrossTradeAmt_t" use="optional"/>
+      <xs:attribute name="NetMny" type="NetMoney_t" use="optional"/>
+      <xs:attribute name="Ccy" type="Currency_t" use="optional"/>
+      <xs:attribute name="CcySrc" type="CurrencyCodeSource_t" use="optional"/>
+      <xs:attribute name="QtyTyp" type="QtyType_t" use="optional"/>
+      <xs:attribute name="SettlDt" type="SettlDate_t" use="optional"/>
+      <xs:attribute name="SettlCurrAmt" type="SettlCurrAmt_t" use="optional"/>
+      <xs:attribute name="SettlCcy" type="SettlCurrency_t" use="optional"/>
+      <xs:attribute name="SettlCcySrc" type="SettlCurrencyCodeSource_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="SettlTradeDetails_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="SettlTradeDetails"
+                     ComponentType="Block"
+                     Category="SettlementStatusManagement"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="SettlTradeDetailsElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="SettlTradeDetailsAttributes"/>
+   </xs:complexType>
+</xs:schema>

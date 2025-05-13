@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-components-impl-Latest.xsd"/>
+   <xs:group name="BusinessMessageRejectElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="BusinessMessageRejectAttributes">
+      <xs:attribute name="RefSeqNum" type="RefSeqNum_t" use="optional"/>
+      <xs:attribute name="RefMsgTyp" type="RefMsgType_t" use="required"/>
+      <xs:attribute name="RefApplVerID" type="RefApplVerID_t" use="optional"/>
+      <xs:attribute name="RefApplExtID" type="RefApplExtID_t" use="optional"/>
+      <xs:attribute name="RefCstmApplVerID" type="RefCstmApplVerID_t" use="optional"/>
+      <xs:attribute name="BizRejRefID" type="BusinessRejectRefID_t" use="optional"/>
+      <xs:attribute name="BizRejRsn" type="BusinessRejectReason_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="BusinessMessageReject_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">BusinessMessageReject can be found at https://www.fixtrading.org/online-specification/business-area-Infrastructure#msg43</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="BusinessMessageReject"
+                     ComponentType="Message"
+                     MsgID="43"
+                     Section="Infrastructure"
+                     Category="BusinessReject"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="BusinessMessageRejectElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="BusinessMessageRejectAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="BizMsgRej"
+               type="BusinessMessageReject_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+</xs:schema>

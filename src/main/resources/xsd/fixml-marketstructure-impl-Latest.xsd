@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-marketstructure-base-Latest.xsd"/>
+</xs:schema>

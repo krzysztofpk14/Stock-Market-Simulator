@@ -1,0 +1,686 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-components-impl-Latest.xsd"/>
+   <xs:group name="AlgoCertificateRequestElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TgtPty"
+                     type="TargetParties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstScnro"
+                     type="TestScenarioGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="AlgoCertificateRequestAttributes">
+      <xs:attribute name="CertReqID" type="AlgoCertificateRequestID_t" use="required"/>
+      <xs:attribute name="TxnTyp"
+                    type="AlgoCertificateRequestTransType_t"
+                    use="required"/>
+      <xs:attribute name="ReqTyp" type="AlgoCertificateRequestType_t" use="required"/>
+      <xs:attribute name="CertReqRefID"
+                    type="AlgoCertificateRequestRefID_t"
+                    use="optional"/>
+      <xs:attribute name="CertID" type="AlgoCertificateID_t" use="optional"/>
+      <xs:attribute name="CertDesc" type="AlgoCertificateDesc_t" use="optional"/>
+      <xs:attribute name="CertStat" type="AlgoCertificateStatus_t" use="optional"/>
+      <xs:attribute name="TstScnroGrpID" type="TestScenarioGroupID_t" use="optional"/>
+      <xs:attribute name="EfctvTm" type="EffectiveTime_t" use="optional"/>
+      <xs:attribute name="AprvlTm" type="ApprovalTime_t" use="optional"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="AlgoCertificateRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">AlgoCertificateRequest can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg170</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="AlgoCertificateRequest"
+                     ComponentType="Message"
+                     MsgID="170"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="AlgoCertificateRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="AlgoCertificateRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="AlgoCertReq"
+               type="AlgoCertificateRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="AlgoCertificateRequestAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="AlgoCertificateRequestAckAttributes">
+      <xs:attribute name="CertReqID" type="AlgoCertificateRequestID_t" use="required"/>
+      <xs:attribute name="ReqTyp" type="AlgoCertificateRequestType_t" use="required"/>
+      <xs:attribute name="ReqStat" type="AlgoCertificateRequestStatus_t" use="required"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="AlgoCertificateRequestAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">AlgoCertificateRequestAck can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg171</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="AlgoCertificateRequestAck"
+                     ComponentType="Message"
+                     MsgID="171"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="AlgoCertificateRequestAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="AlgoCertificateRequestAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="AlgoCertReqAck"
+               type="AlgoCertificateRequestAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="AlgoCertificateReportElements">
+      <xs:sequence>
+         <xs:element name="Pty" type="Parties_Block_t" maxOccurs="unbounded"/>
+         <xs:element name="StrtPrmGrp"
+                     type="StrategyParametersGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="AlgoSysModl"
+                     type="AlgoSystemModuleGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstScnro"
+                     type="TestScenarioGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="AlgoCertificateReportAttributes">
+      <xs:attribute name="CertRptID" type="AlgoCertificateReportID_t" use="required"/>
+      <xs:attribute name="CertReqID" type="AlgoCertificateRequestID_t" use="optional"/>
+      <xs:attribute name="TxnTyp"
+                    type="AlgoCertificateReportTransType_t"
+                    use="required"/>
+      <xs:attribute name="RptTyp" type="AlgoCertificateReportType_t" use="optional"/>
+      <xs:attribute name="CertRptRefID"
+                    type="AlgoCertificateReportRefID_t"
+                    use="optional"/>
+      <xs:attribute name="CertID" type="AlgoCertificateID_t" use="required"/>
+      <xs:attribute name="CertDesc" type="AlgoCertificateDesc_t" use="optional"/>
+      <xs:attribute name="CertStat" type="AlgoCertificateStatus_t" use="required"/>
+      <xs:attribute name="EfctvTm" type="EffectiveTime_t" use="optional"/>
+      <xs:attribute name="AprvlTm" type="ApprovalTime_t" use="optional"/>
+      <xs:attribute name="LastUpdateTm" type="LastUpdateTime_t" use="required"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="optional"/>
+      <xs:attribute name="TstDesc" type="AlgoTestDesc_t" use="optional"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+      <xs:attribute name="TstSteStat" type="TestSuiteStatus_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="AlgoCertificateReport_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">AlgoCertificateReport can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg172</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="AlgoCertificateReport"
+                     ComponentType="Message"
+                     MsgID="172"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="AlgoCertificateReportElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="AlgoCertificateReportAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="AlgoCertRpt"
+               type="AlgoCertificateReport_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="AlgoCertificateReportAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="AlgoCertificateReportAckAttributes">
+      <xs:attribute name="CertRptID" type="AlgoCertificateReportID_t" use="required"/>
+      <xs:attribute name="RptStat" type="AlgoCertificateReportStatus_t" use="required"/>
+      <xs:attribute name="RptTyp" type="AlgoCertificateReportType_t" use="optional"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="AlgoCertificateReportAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">AlgoCertificateReportAck can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg173</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="AlgoCertificateReportAck"
+                     ComponentType="Message"
+                     MsgID="173"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="AlgoCertificateReportAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="AlgoCertificateReportAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="AlgoCertRptAck"
+               type="AlgoCertificateReportAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="TestSuiteDefinitionRequestElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="StrtPrmGrp"
+                     type="StrategyParametersGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="AlgoSysModl"
+                     type="AlgoSystemModuleGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstScnro"
+                     type="TestScenarioGrp_Block_t"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestSuiteDefinitionRequestAttributes">
+      <xs:attribute name="TstSteReqID" type="TestSuiteRequestID_t" use="required"/>
+      <xs:attribute name="TxnTyp" type="TestSuiteRequestTransType_t" use="required"/>
+      <xs:attribute name="TstSteReqRefID" type="TestSuiteRequestRefID_t" use="optional"/>
+      <xs:attribute name="TstScnroGrpID" type="TestScenarioGroupID_t" use="optional"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestSuiteDefinitionRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">TestSuiteDefinitionRequest can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg174</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestSuiteDefinitionRequest"
+                     ComponentType="Message"
+                     MsgID="174"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="TestSuiteDefinitionRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="TestSuiteDefinitionRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="TstSteDefReq"
+               type="TestSuiteDefinitionRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="TestSuiteDefinitionRequestAckElements">
+      <xs:sequence>
+         <xs:element name="TstGtwyDetl"
+                     type="TestGatewayDetailGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestSuiteDefinitionRequestAckAttributes">
+      <xs:attribute name="TstSteReqID" type="TestSuiteRequestID_t" use="required"/>
+      <xs:attribute name="ReqStat" type="TestSuiteRequestStatus_t" use="required"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestSuiteDefinitionRequestAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">TestSuiteDefinitionRequestAck can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg175</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestSuiteDefinitionRequestAck"
+                     ComponentType="Message"
+                     MsgID="175"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="TestSuiteDefinitionRequestAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="TestSuiteDefinitionRequestAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="TstSteDefReqAck"
+               type="TestSuiteDefinitionRequestAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="TestActionRequestElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="Parties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstScnro"
+                     type="TestScenarioGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestActionRequestAttributes">
+      <xs:attribute name="ReqID" type="TestActionRequestID_t" use="required"/>
+      <xs:attribute name="ActnTyp" type="TestActionType_t" use="required"/>
+      <xs:attribute name="TstSteReqID" type="TestSuiteRequestID_t" use="required"/>
+      <xs:attribute name="TxnTm" type="TransactTime_t" use="required"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestActionRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">TestActionRequest can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg176</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestActionRequest"
+                     ComponentType="Message"
+                     MsgID="176"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="TestActionRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="TestActionRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="TstActnReq"
+               type="TestActionRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="TestActionRequestAckElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestActionRequestAckAttributes">
+      <xs:attribute name="ReqID" type="TestActionRequestID_t" use="required"/>
+      <xs:attribute name="TstSteReqID" type="TestSuiteRequestID_t" use="required"/>
+      <xs:attribute name="TstSteActvtySt"
+                    type="TestSuiteActivityState_t"
+                    use="required"/>
+      <xs:attribute name="ReqStat" type="TestActionRequestStatus_t" use="required"/>
+      <xs:attribute name="RejTxt" type="RejectText_t" use="optional"/>
+      <xs:attribute name="EncRejTxtLen" type="EncodedRejectTextLen_t" use="optional"/>
+      <xs:attribute name="EncRejTxt" type="EncodedRejectText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestActionRequestAck_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">TestActionRequestAck can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg177</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestActionRequestAck"
+                     ComponentType="Message"
+                     MsgID="177"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="TestActionRequestAckElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="TestActionRequestAckAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="TstActnReqAck"
+               type="TestActionRequestAck_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="TestActionReportElements">
+      <xs:sequence>
+         <xs:element name="StrtPrmGrp"
+                     type="StrategyParametersGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="AlgoSysModl"
+                     type="AlgoSystemModuleGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstScnro"
+                     type="TestScenarioGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestActionReportAttributes">
+      <xs:attribute name="RptID" type="TestActionReportID_t" use="required"/>
+      <xs:attribute name="TstSteReqID" type="TestSuiteRequestID_t" use="required"/>
+      <xs:attribute name="TstSteStat" type="TestSuiteStatus_t" use="optional"/>
+      <xs:attribute name="Txt" type="Text_t" use="optional"/>
+      <xs:attribute name="EncTxtLen" type="EncodedTextLen_t" use="optional"/>
+      <xs:attribute name="EncTxt" type="EncodedText_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestActionReport_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">TestActionReport can be found at https://www.fixtrading.org/online-specification/business-area-PreTrade#msg178</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestActionReport"
+                     ComponentType="Message"
+                     MsgID="178"
+                     Section="PreTrade"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="TestActionReportElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="TestActionReportAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="TstActnRpt"
+               type="TestActionReport_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="AlgoSystemModuleGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="AlgoSystemModuleGrpAttributes">
+      <xs:attribute name="Name" type="AlgoSystemModuleName_t" use="optional"/>
+      <xs:attribute name="Ver" type="AlgoSystemModuleVersion_t" use="optional"/>
+      <xs:attribute name="LastUpdateTm"
+                    type="AlgoSystemModuleLastUpdateTime_t"
+                    use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="AlgoSystemModuleGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="AlgoSystemModuleGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="AlgoSystemModuleGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="AlgoSystemModuleGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestScenarioGrpElements">
+      <xs:sequence>
+         <xs:element name="Pty"
+                     type="NestedParties_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="InstrmtScope"
+                     type="InstrumentScopeGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstStep"
+                     type="TestStepGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstSysModl"
+                     type="TestSystemModuleGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstMsr"
+                     type="TestMeasureGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+         <xs:element name="TstOrd"
+                     type="TestOrderGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestScenarioGrpAttributes">
+      <xs:attribute name="ID" type="TestScenarioID_t" use="optional"/>
+      <xs:attribute name="Stat" type="TestScenarioStatus_t" use="optional"/>
+      <xs:attribute name="StartTm" type="TestScenarioStartTime_t" use="optional"/>
+      <xs:attribute name="EndTm" type="TestScenarioEndTime_t" use="optional"/>
+      <xs:attribute name="MDOrigTyp" type="MDOriginType_t" use="optional"/>
+      <xs:attribute name="MDOrigDesc" type="MDOriginDesc_t" use="optional"/>
+      <xs:attribute name="MDOrigTm" type="MDOriginTime_t" use="optional"/>
+      <xs:attribute name="TstStepGrpID" type="TestStepGroupID_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestScenarioGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestScenarioGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestScenarioGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestScenarioGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestStepGrpElements">
+      <xs:sequence>
+         <xs:element name="TstStepPrm"
+                     type="TestStepParameterGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="TestStepGrpAttributes">
+      <xs:attribute name="ID" type="TestStepID_t" use="optional"/>
+      <xs:attribute name="Desc" type="TestStepDesc_t" use="optional"/>
+      <xs:attribute name="StartTm" type="TestStepStartTime_t" use="optional"/>
+      <xs:attribute name="StartOfstPeriod"
+                    type="TestStepStartOffsetPeriod_t"
+                    use="optional"/>
+      <xs:attribute name="StartOfstUnit"
+                    type="TestStepStartOffsetUnit_t"
+                    use="optional"/>
+      <xs:attribute name="EndTm" type="TestStepEndTime_t" use="optional"/>
+      <xs:attribute name="EndOfstPeriod"
+                    type="TestStepEndOffsetPeriod_t"
+                    use="optional"/>
+      <xs:attribute name="EndOfstUnit" type="TestStepEndOffsetUnit_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestStepGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestStepGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestStepGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestStepGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestStepParameterGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestStepParameterGrpAttributes">
+      <xs:attribute name="PrmName" type="TestStepParameterName_t" use="optional"/>
+      <xs:attribute name="PrmTyp" type="TestStepParameterType_t" use="optional"/>
+      <xs:attribute name="PrmVal" type="TestStepParameterValue_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestStepParameterGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestStepParameterGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestStepParameterGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestStepParameterGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestSystemModuleGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestSystemModuleGrpAttributes">
+      <xs:attribute name="Name" type="TestSystemModuleName_t" use="optional"/>
+      <xs:attribute name="Ver" type="TestSystemModuleVersion_t" use="optional"/>
+      <xs:attribute name="LastUpdateTm"
+                    type="TestSystemModuleLastUpdateTime_t"
+                    use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestSystemModuleGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestSystemModuleGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestSystemModuleGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestSystemModuleGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestMeasureGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestMeasureGrpAttributes">
+      <xs:attribute name="Name" type="TestMeasureName_t" use="optional"/>
+      <xs:attribute name="Desc" type="TestMeasureDesc_t" use="optional"/>
+      <xs:attribute name="Typ" type="TestMeasureType_t" use="optional"/>
+      <xs:attribute name="Prcsn" type="TestMeasurePrecision_t" use="optional"/>
+      <xs:attribute name="Rslt" type="TestMeasureResult_t" use="optional"/>
+      <xs:attribute name="ThresholdTyp" type="TestThresholdType_t" use="optional"/>
+      <xs:attribute name="WarnLvlVal" type="TestWarningLevelValue_t" use="optional"/>
+      <xs:attribute name="FailLvlVal" type="TestFailLevelValue_t" use="optional"/>
+      <xs:attribute name="PeakLvlVal" type="TestPeakLevelValue_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestMeasureGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestMeasureGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestMeasureGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestMeasureGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestOrderGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestOrderGrpAttributes">
+      <xs:attribute name="ID" type="TestOrderID_t" use="optional"/>
+      <xs:attribute name="Sym" type="TestOrderSymbol_t" use="optional"/>
+      <xs:attribute name="SecID" type="TestOrderSecurityID_t" use="optional"/>
+      <xs:attribute name="SecIDSrc" type="TestOrderSecurityIDSource_t" use="optional"/>
+      <xs:attribute name="Px" type="TestOrderPrice_t" use="optional"/>
+      <xs:attribute name="PxTyp" type="TestOrderPriceType_t" use="optional"/>
+      <xs:attribute name="Qty" type="TestOrderQty_t" use="optional"/>
+      <xs:attribute name="OfstPeriod" type="TestOrderOffsetPeriod_t" use="optional"/>
+      <xs:attribute name="OfstUnit" type="TestOrderOffsetUnit_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestOrderGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestOrderGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestOrderGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestOrderGrpAttributes"/>
+   </xs:complexType>
+   <xs:group name="TestGatewayDetailGrpElements">
+      <xs:sequence/>
+   </xs:group>
+   <xs:attributeGroup name="TestGatewayDetailGrpAttributes">
+      <xs:attribute name="Name" type="TestGatewayDetailName_t" use="optional"/>
+      <xs:attribute name="Typ" type="TestGatewayDetailType_t" use="optional"/>
+      <xs:attribute name="Val" type="TestGatewayDetailValue_t" use="optional"/>
+      <xs:attribute name="MktID" type="TestGatewayMarketID_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="TestGatewayDetailGrp_Block_t">
+      <xs:annotation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="TestGatewayDetailGrp"
+                     ComponentType="BlockRepeating"
+                     Category="Testing"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:sequence>
+         <xs:group ref="TestGatewayDetailGrpElements"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="TestGatewayDetailGrpAttributes"/>
+   </xs:complexType>
+</xs:schema>

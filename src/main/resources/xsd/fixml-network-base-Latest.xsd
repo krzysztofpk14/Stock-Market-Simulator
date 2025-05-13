@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+		FIXML Schema Version FIX.Latest EP296
+
+		Generated: 2025-04-15T04:06:24.5290136-04:00
+
+		Copyright(c) FIX Protocol Limited. All rights reserved.
+
+        Comments and errors should be posted on the FIX Protocol web-site https://www.fixtrading.org/
+		-->
+<xs:schema xmlns="http://www.fixprotocol.org/FIXML-Latest"
+           xmlns:fixr="http://fixprotocol.io/2020/orchestra/repository"
+           xmlns:fm="http://www.fixprotocol.org/FIXML-Latest/METADATA"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.fixprotocol.org/FIXML-Latest/METADATA fixml-metadata-Latest.xsd"
+           targetNamespace="http://www.fixprotocol.org/FIXML-Latest"
+           elementFormDefault="qualified"
+           attributeFormDefault="unqualified">
+   <xs:include schemaLocation="fixml-components-impl-Latest.xsd"/>
+   <xs:group name="NetworkCounterpartySystemStatusRequestElements">
+      <xs:sequence>
+         <xs:element name="CIDReq"
+                     type="CompIDReqGrp_Block_t"
+                     minOccurs="0"
+                     maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="NetworkCounterpartySystemStatusRequestAttributes">
+      <xs:attribute name="NtwkReqTyp" type="NetworkRequestType_t" use="required"/>
+      <xs:attribute name="NtwkReqID" type="NetworkRequestID_t" use="required"/>
+   </xs:attributeGroup>
+   <xs:complexType name="NetworkCounterpartySystemStatusRequest_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">NetworkCounterpartySystemStatusRequest can be found at https://www.fixtrading.org/online-specification/business-area-Infrastructure#msg88</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="NetworkCounterpartySystemStatusRequest"
+                     ComponentType="Message"
+                     MsgID="88"
+                     Section="Infrastructure"
+                     Category="Network"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="NetworkCounterpartySystemStatusRequestElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="NetworkCounterpartySystemStatusRequestAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="NtwkSysStatReq"
+               type="NetworkCounterpartySystemStatusRequest_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+   <xs:group name="NetworkCounterpartySystemStatusResponseElements">
+      <xs:sequence>
+         <xs:element name="CIDStat" type="CompIDStatGrp_Block_t" maxOccurs="unbounded"/>
+      </xs:sequence>
+   </xs:group>
+   <xs:attributeGroup name="NetworkCounterpartySystemStatusResponseAttributes">
+      <xs:attribute name="NtwkStatRspTyp"
+                    type="NetworkStatusResponseType_t"
+                    use="required"/>
+      <xs:attribute name="NtwkReqID" type="NetworkRequestID_t" use="optional"/>
+      <xs:attribute name="NtwkRspID" type="NetworkResponseID_t" use="required"/>
+      <xs:attribute name="LastNtwkRspID" type="LastNetworkResponseID_t" use="optional"/>
+   </xs:attributeGroup>
+   <xs:complexType name="NetworkCounterpartySystemStatusResponse_message_t" final="#all">
+      <xs:annotation>
+         <xs:documentation xml:lang="en">NetworkCounterpartySystemStatusResponse can be found at https://www.fixtrading.org/online-specification/business-area-Infrastructure#msg89</xs:documentation>
+         <xs:appinfo>
+            <fm:Xref Protocol="FIX"
+                     name="NetworkCounterpartySystemStatusResponse"
+                     ComponentType="Message"
+                     MsgID="89"
+                     Section="Infrastructure"
+                     Category="Network"/>
+         </xs:appinfo>
+      </xs:annotation>
+      <xs:complexContent>
+         <xs:extension base="Abstract_message_t">
+            <xs:sequence>
+               <xs:group ref="NetworkCounterpartySystemStatusResponseElements"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="NetworkCounterpartySystemStatusResponseAttributes"/>
+         </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+   <xs:element name="NtwkSysStatRsp"
+               type="NetworkCounterpartySystemStatusResponse_message_t"
+               substitutionGroup="Message"
+               final="#all"/>
+</xs:schema>
