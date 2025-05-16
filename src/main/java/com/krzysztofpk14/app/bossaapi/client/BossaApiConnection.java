@@ -35,6 +35,7 @@ public class BossaApiConnection {
         output = socket.getOutputStream();
         connected = true;
         executorService = Executors.newSingleThreadExecutor();
+        socket.setSoTimeout(30000); // Timeout na 30 sekund
     }
     
     /**
@@ -68,10 +69,16 @@ public class BossaApiConnection {
         if (!connected) {
             throw new IOException("Nie nawiązano połączenia z serwerem");
         }
-        
-        // Dodajemy separator końca wiadomości
-        String message = xmlMessage + "\n";
-        output.write(message.getBytes(StandardCharsets.UTF_8));
+
+        // Convert the message to bytes
+        byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
+
+        // Send the length of the message as an integer (4 bytes)
+        int messageLength = messageBytes.length;
+        output.write(messageLength);
+
+        // Send the actual message
+        output.write(messageBytes);
         output.flush();
     }
     
@@ -81,6 +88,7 @@ public class BossaApiConnection {
      * @param handler Funkcja przetwarzająca odebrane komunikaty
      */
     public void startReceiving(Consumer<String> handler) {
+        System.out.println("Rozpoczęto odbieranie wiadomości...");
         if (!connected || receiveRunning) {
             return;
         }
@@ -97,26 +105,44 @@ public class BossaApiConnection {
                 while (receiveRunning) {
                     bytesRead = input.read(readBuffer);
                     
+                    
                     if (bytesRead == -1) {
                         // Koniec strumienia, serwer zamknął połączenie
+                        // System.out.println("Koniec strumienia");
+                        String message = buffer.substring(2);
+                        buffer.delete(0, buffer.length());
+                        if (messageHandler != null) {
+                                final String finalMessage = message;
+                                executorService.submit(() -> messageHandler.accept(finalMessage));
+                        }
+                        // if (messageHandler != null) {
+                        //     messageHandler.accept(message);
+                        // }
                         break;
                     }
+                    // System.out.println("Odczytano dane z gniazda: " + new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8));
                     
                     String data = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
                     buffer.append(data);
                     
                     // Szukamy zakończeń wiadomości
-                    int endIndex;
-                    while ((endIndex = buffer.indexOf("\n")) != -1) {
-                        String message = buffer.substring(0, endIndex);
-                        buffer.delete(0, endIndex + 1);
+                    // int endIndex;
+                    // while ((endIndex = buffer.indexOf("\n")) != -1) {
+                    //     String message = buffer.substring(0, endIndex);
+                    //     buffer.delete(0, endIndex + 1);
+
+                    //    System.out.println("Przekazywanie wiadomości do handlera: " + message);
+
+                    //     if (messageHandler != null) {
+                    //         messageHandler.accept(message);
+                    //     }
                         
-                        // Przetwarzamy wiadomość w puli wątków
-                        if (messageHandler != null) {
-                            final String finalMessage = message;
-                            executorService.submit(() -> messageHandler.accept(finalMessage));
-                        }
-                    }
+                    //     // // Przetwarzamy wiadomość w puli wątków
+                    //     // if (messageHandler != null) {
+                    //     //     final String finalMessage = message;
+                    //     //     executorService.submit(() -> messageHandler.accept(finalMessage));
+                    //     // }
+                    // }
                 }
             } catch (IOException e) {
                 if (receiveRunning) {
@@ -155,4 +181,5 @@ public class BossaApiConnection {
     public boolean isConnected() {
         return connected && socket != null && socket.isConnected() && !socket.isClosed();
     }
+
 }

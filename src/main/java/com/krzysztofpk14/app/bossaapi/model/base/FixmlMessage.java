@@ -23,7 +23,8 @@ public class FixmlMessage {
         @XmlElement(name = "Order", type = com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.class),
         @XmlElement(name = "ExecRpt", type = com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport.class),
         @XmlElement(name = "MktDataReq", type = com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest.class),
-        @XmlElement(name = "MktDataSnap", type = com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse.class)
+        @XmlElement(name = "MktDataSnap", type = com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse.class),
+        @XmlElement(name = "BizMsgRej", type = com.krzysztofpk14.app.bossaapi.model.response.BusinessMessageReject.class)
     })
     private BaseMessage message;
     

@@ -5,6 +5,7 @@ import com.krzysztofpk14.app.bossaapi.model.base.FixmlMessage;
 import com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.UserRequest;
+import com.krzysztofpk14.app.bossaapi.model.response.BusinessMessageReject;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
 import com.krzysztofpk14.app.bossaapi.model.response.UserResponse;
@@ -155,16 +156,19 @@ public class BossaApiClient {
         if (!isLoggedIn()) {
             throw new IllegalStateException("Użytkownik nie jest zalogowany");
         }
-        
+         
         String requestId = request.getRequestId();
         if (requestId == null || requestId.isEmpty()) {
             requestId = generateRequestId();
             request.setRequestId(requestId);
         }
-        
+
         marketDataHandlers.put(requestId, handler);
+        System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
+        
         
         sendMessage(request);
+        connection.startReceiving(this::handleMessage);
     }
     
     /**
@@ -195,9 +199,12 @@ public class BossaApiClient {
      * @param xml Treść wiadomości XML
      */
     private void handleMessage(String xml) {
+        System.out.println("Odebrano wiadomość:" + xml);
+
         try {
             FixmlMessage message = FixmlParser.parse(xml);
             BaseMessage baseMessage = message.getMessage();
+            System.out.println("Typ wiadomości: " + baseMessage.getMessageType());
             
             if (baseMessage instanceof UserResponse) {
                 handleUserResponse((UserResponse) baseMessage);
@@ -205,9 +212,12 @@ public class BossaApiClient {
                 handleExecutionReport((ExecutionReport) baseMessage);
             } else if (baseMessage instanceof MarketDataResponse) {
                 handleMarketDataResponse((MarketDataResponse) baseMessage);
-            }
+            } else if (baseMessage instanceof BusinessMessageReject) {
+            handleBusinessMessageReject((BusinessMessageReject) baseMessage);
+        }
         } catch (JAXBException e) {
-            System.err.println("Błąd podczas parsowania wiadomości FIXML: " + e.getMessage());
+            System.err.println("Błąd podczas parsowania wiadomości FIXML: " + e);
+            e.printStackTrace();
         }
     }
     
@@ -272,6 +282,18 @@ public class BossaApiClient {
             handler.accept(response);
         }
     }
+
+    /**
+     * Obsługuje odrzucone wiadomości biznesowe.
+     * 
+     * @param reject Odrzucona wiadomość biznesowa
+     */
+    private void handleBusinessMessageReject(BusinessMessageReject reject) {
+        System.err.println("Otrzymano BusinessMessageReject:");
+        System.err.println("RefMsgType: " + reject.getRefMsgType());
+        System.err.println("BusinessRejectReason: " + reject.getBusinessRejectReason());
+        System.err.println("Text: " + reject.getText());
+    }
     
     /**
      * Sprawdza, czy użytkownik jest zalogowany.
@@ -297,6 +319,6 @@ public class BossaApiClient {
      * @return Unikalny identyfikator
      */
     private String generateRequestId() {
-        return "0";
+        return "5";
     }
 }

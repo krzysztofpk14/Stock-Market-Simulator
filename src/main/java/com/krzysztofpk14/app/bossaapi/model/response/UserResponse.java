@@ -13,19 +13,22 @@ public class UserResponse extends BaseMessage {
     @XmlAttribute(name = "UserReqID")
     private String userReqID;
     
-    @XmlAttribute(name = "UserStatus")
-    private String userStatus;  // 1=zalogowany, 2=wylogowany, 3=nieudane logowanie
+    @XmlAttribute(name = "UserStat")
+    private String userStatus;  // 1=zalogowany, 2=wylogowany, 3=użytkownik nie istnieje, 4=błędne hasło, 5=inwestor offline, 6= inne, 7 =nol offline
     
-    @XmlAttribute(name = "UserStatusText")
+    @XmlAttribute(name = "UserStatText")
     private String userStatusText;
     
     @XmlAttribute(name = "Username")
     private String username;
+
+    @XmlAttribute(name = "MktDepth") //int, Ilość ofert, 0 -> 5 ofert (rezerwa na cały arkusz), 1-> 1 oferta, 5-> 5 ofert
+    private int mktDepth;
     
     // Stałe dla statusów
     public static final String LOGGED_IN = "1";
     public static final String LOGGED_OUT = "2";
-    public static final String LOGIN_FAILED = "3";
+    public static final String OTHER = "6";
     
     // Konstruktory
     public UserResponse() {
@@ -51,6 +54,10 @@ public class UserResponse extends BaseMessage {
     public String getUserStatusText() {
         return userStatusText;
     }
+
+    public int getMktDepth() {
+        return mktDepth;
+    }
     
     public void setUserStatusText(String userStatusText) {
         this.userStatusText = userStatusText;
@@ -63,6 +70,10 @@ public class UserResponse extends BaseMessage {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public void setMktDepth(int mktDepth) {
+        this.mktDepth = mktDepth;
+    }
     
     @Override
     public String getMessageType() {
@@ -74,6 +85,6 @@ public class UserResponse extends BaseMessage {
      * @return true jeśli zalogowano pomyślnie
      */
     public boolean isLoginSuccessful() {
-        return LOGGED_IN.equals(userStatus);
+        return LOGGED_IN.equals(userStatus) ||  (OTHER.equals(userStatus) && (userStatusText == "User is already logged"));
     }
 }

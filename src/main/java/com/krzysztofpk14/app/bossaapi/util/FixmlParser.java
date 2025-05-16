@@ -30,8 +30,15 @@ public class FixmlParser {
      * @throws JAXBException Jeśli wystąpi błąd parsowania
      */
     public static FixmlMessage parse(String xmlString) throws JAXBException {
+        // xmlString.trim().replaceFirst("^([\\W]+)<", "<");
+        String cleanedString = xmlString.replaceAll("\u0000", "");
+        // char firstChar = cleanedString.charAt(0);
+        // int firstCharCode = (int) firstChar;
+        // System.out.println("Pierwszy znak: " + cleanedString.charAt(0) + " Kod: " + firstCharCode);
+
+
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        return (FixmlMessage) unmarshaller.unmarshal(new StringReader(xmlString));
+        return (FixmlMessage) unmarshaller.unmarshal(new StringReader(cleanedString));
     }
     
     /**

@@ -17,6 +17,7 @@ com\krzysztofpk14\app\RepositoryReporter.class
 com\krzysztofpk14\app\fixml\UserReq.class
 com\krzysztofpk14\app\FixmlParser.class
 com\krzysztofpk14\app\bossaapi\client\BossaApiConnection.class
+com\krzysztofpk14\app\bossaapi\model\response\BusinessMessageReject.class
 com\krzysztofpk14\app\bossaapi\model\response\MarketDataResponse$Instrument.class
 com\krzysztofpk14\app\bossaapi\model\request\OrderRequest.class
 com\krzysztofpk14\app\bossaapi\model\request\OrderRequest$Instrument.class

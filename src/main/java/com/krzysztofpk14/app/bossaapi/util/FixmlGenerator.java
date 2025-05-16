@@ -23,7 +23,8 @@ public class FixmlGenerator {
             com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.class,
             com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport.class,
             com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest.class,
-            com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse.class);
+            com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse.class,
+            com.krzysztofpk14.app.bossaapi.model.response.BusinessMessageReject.class);
         } catch (JAXBException e) {
             System.err.println("Blad inicjalizacji JAXB: " + e.getMessage());
             e.printStackTrace();
@@ -41,6 +42,7 @@ public class FixmlGenerator {
     public static String generateXml(FixmlMessage message) throws JAXBException {
         Marshaller marshaller = jaxbContext.createMarshaller();
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
         
         StringWriter writer = new StringWriter();
         marshaller.marshal(message, writer);

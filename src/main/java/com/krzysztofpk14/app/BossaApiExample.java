@@ -5,15 +5,16 @@ import com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.Instrument;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.OrderQuantity;
-import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
+// import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 // import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
 import com.krzysztofpk14.app.bossaapi.model.response.UserResponse;
 
-import java.util.UUID;
+// import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 // import java.util.concurrent.ExecutionException;
 
 public class BossaApiExample {
+    private static int requestIdCounter = 0;
     
     public static void main(String[] args) {
         BossaApiClient client = new BossaApiClient();
@@ -40,7 +41,7 @@ public class BossaApiExample {
                 // Żądanie danych rynkowych
                 System.out.println("Żądanie danych rynkowych dla KGHM...");
                 MarketDataRequest marketDataRequest = new MarketDataRequest();
-                marketDataRequest.setRequestId(generateId());
+                marketDataRequest.setRequestId(String.valueOf(generateId())); // Konwersja int na String
                 marketDataRequest.setSubscriptionRequestType(MarketDataRequest.SNAPSHOT);
                 marketDataRequest.addInstrument("KGHM");
                 
@@ -54,12 +55,12 @@ public class BossaApiExample {
                 });
                 
                 // Wysłanie zlecenia kupna
-                System.out.println("Wysyłanie zlecenia kupna...");
-                OrderRequest orderRequest = createSampleOrder();
-                CompletableFuture<ExecutionReport> orderFuture = client.sendOrder(orderRequest);
-                ExecutionReport report = orderFuture.get(); // Czekamy na odpowiedź
+                // System.out.println("Wysyłanie zlecenia kupna...");
+                // OrderRequest orderRequest = createSampleOrder();
+                // CompletableFuture<ExecutionReport> orderFuture = client.sendOrder(orderRequest);
+                // ExecutionReport report = orderFuture.get(); // Czekamy na odpowiedź
                 
-                System.out.println("Otrzymano potwierdzenie: " + report.getExecutionType());
+                // System.out.println("Otrzymano potwierdzenie: " + report.getExecutionType());
                 
                 // Czekamy na dane i raporty
                 Thread.sleep(5000);
@@ -74,6 +75,7 @@ public class BossaApiExample {
             }
               } catch (Exception e) {
             System.err.println("ERROR: " + e);
+            e.printStackTrace();
         } finally {
             // Zawsze zamykamy połączenie na końcu
             if (client.isConnected()) {
@@ -90,7 +92,7 @@ public class BossaApiExample {
         OrderRequest order = new OrderRequest();
         
         // Ustawienie podstawowych parametrów zlecenia
-        order.setClientOrderId(generateId());
+        order.setClientOrderId(String.valueOf(generateId())); // Konwersja int na String
         order.setSide(OrderRequest.BUY);  // Kupno
         order.setOrderType(OrderRequest.LIMIT);  // Limit
         order.setTimeInForce(OrderRequest.DAY);  // Dzienne
@@ -115,8 +117,8 @@ public class BossaApiExample {
      * Generuje unikalny identyfikator dla żądań
      * @return Unikalny identyfikator
      */
-    private static String generateId() {
-        return UUID.randomUUID().toString().substring(0, 8);
+    private static synchronized int generateId() {
+        return ++requestIdCounter;
     }
 }
 
