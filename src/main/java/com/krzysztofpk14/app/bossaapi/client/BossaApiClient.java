@@ -52,7 +52,7 @@ public class BossaApiClient {
      */
     public void connect(String host, int port) throws IOException {
         connection.connect(host, port);
-        connection.startReceiving(this::handleMessage);
+        // connection.startReceiving(this::handleMessage);
     }
     
     /**
@@ -79,7 +79,7 @@ public class BossaApiClient {
      * @throws IOException Jeśli wystąpi błąd połączenia
      * @throws JAXBException Jeśli wystąpi błąd generowania XML
      */
-    public CompletableFuture<UserResponse> login(String username, String password) throws IOException, JAXBException {
+    public CompletableFuture<UserResponse> loginAsync(String username, String password) throws IOException, JAXBException {
         String requestId = generateRequestId();
         
         UserRequest request = new UserRequest(requestId, username, password);
@@ -90,6 +90,30 @@ public class BossaApiClient {
         
         sendMessage(request);
         return future;
+    }
+
+
+    public UserResponse loginSync(String username, String password) throws IOException, JAXBException, InterruptedException {
+        String requestId = generateRequestId();
+        UserRequest request = new UserRequest(requestId, username, password);
+        String requestXml = FixmlGenerator.generateXml(request);
+        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
+        System.out.println("Odpowiedź: " + response);
+
+        if (response != null) {
+            FixmlMessage fixmlMessage = FixmlParser.parse(response);
+            if (fixmlMessage != null && fixmlMessage.getMessage() instanceof UserResponse) {
+                UserResponse userResp = (UserResponse) fixmlMessage.getMessage();
+                if (userResp.getUserStatus().equals(UserResponse.LOGGED_IN)) {
+                    loggedIn = true;
+                } else if (userResp.getUserStatus().equals(UserResponse.LOGGED_OUT)) {
+                    loggedIn = false;
+                }
+                return userResp;
+            }
+        }
+
+        return null;
     }
     
     /**
@@ -152,9 +176,9 @@ public class BossaApiClient {
      * @throws IOException Jeśli wystąpi błąd połączenia
      * @throws JAXBException Jeśli wystąpi błąd generowania XML
      */
-    public void requestMarketData(MarketDataRequest request, Consumer<MarketDataResponse> handler) throws IOException, JAXBException {
+    public MarketDataResponse requestMarketData(MarketDataRequest request) throws IOException, JAXBException {
         if (!isLoggedIn()) {
-            throw new IllegalStateException("Użytkownik nie jest zalogowany");
+            throw new IllegalStateException("Uzytkownik nie jest zalogowany");
         }
          
         String requestId = request.getRequestId();
@@ -163,12 +187,25 @@ public class BossaApiClient {
             request.setRequestId(requestId);
         }
 
-        marketDataHandlers.put(requestId, handler);
+        // marketDataHandlers.put(requestId, handler);
         System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
-        
-        
-        sendMessage(request);
-        connection.startReceiving(this::handleMessage);
+
+        String requestXml = FixmlGenerator.generateXml(request);
+        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
+        System.out.println("Odpowiedź: " + response);
+
+        if (response != null) {
+            FixmlMessage fixmlMessage = FixmlParser.parse(response);
+            if (fixmlMessage != null && fixmlMessage.getMessage() instanceof MarketDataResponse) {
+                MarketDataResponse marketDataResponse = (MarketDataResponse) fixmlMessage.getMessage();
+                return marketDataResponse;
+            } else {
+                System.err.println("Otrzymano nieprawidłową odpowiedź: " + response);
+            }
+        } else {
+            System.err.println("Brak odpowiedzi z serwera");
+        }
+        return null;
     }
     
     /**

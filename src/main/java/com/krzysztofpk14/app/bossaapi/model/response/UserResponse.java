@@ -28,7 +28,12 @@ public class UserResponse extends BaseMessage {
     // Stałe dla statusów
     public static final String LOGGED_IN = "1";
     public static final String LOGGED_OUT = "2";
+    public static final String USER_NOT_EXIST = "3";
+    public static final String WRONG_PASSWORD = "4";
+    public static final String INVESTOR_OFFLINE = "5";
     public static final String OTHER = "6";
+    public static final String NOL_OFFLINE = "7";
+    
     
     // Konstruktory
     public UserResponse() {
@@ -85,6 +90,6 @@ public class UserResponse extends BaseMessage {
      * @return true jeśli zalogowano pomyślnie
      */
     public boolean isLoginSuccessful() {
-        return LOGGED_IN.equals(userStatus) ||  (OTHER.equals(userStatus) && (userStatusText == "User is already logged"));
+        return LOGGED_IN.equals(userStatus)||  (OTHER.equals(userStatus) && (userStatusText == "User is already logged"));
     }
 }

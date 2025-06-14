@@ -61,12 +61,25 @@ public class ExecutionReport extends BaseMessage {
     @XmlElement(name = "OrdQty")
     private OrderQuantity orderQuantity;
     
-    // Stałe dla typów wykonania
+    // Stałe dla typów wykonania ExecType
     public static final String NEW = "0";
-    public static final String PARTIALLY_FILLED = "1";
-    public static final String FILLED = "2";
-    public static final String CANCELED = "4";
+    public static final String TRANSACTION = "F";
+    public static final String CANCELING = "4";
+    public static final String MODIFICATION = "E";
+    public static final String DURING_CANCELATION = "6";
     public static final String REJECTED = "8";
+    public static final String ORDER_STATUS = "I";
+
+    // Stałe dla OrdStatus
+    public static final String NEW_ORDER = "0";
+    public static final String ARCHIVED = "C";
+    public static final String DURING_MODIFICATION = "E";
+    public static final String ACTIVE = "1";
+    public static final String DONE = "2";
+    public static final String CANCELED = "4";
+    public static final String ORDER_DURING_CANCELATION = "6";
+    public static final String REJECTED_ORDER = "8";
+
     
     // Konstruktory
     public ExecutionReport() {
@@ -223,6 +236,9 @@ public class ExecutionReport extends BaseMessage {
         
         @XmlAttribute(name = "ID")
         private String id;
+
+        @XmlAttribute(name = "Src")
+        private String idSource;
         
         public String getSymbol() {
             return symbol;
@@ -238,6 +254,14 @@ public class ExecutionReport extends BaseMessage {
         
         public void setId(String id) {
             this.id = id;
+        }
+
+        public String getIdSource() {
+            return idSource;
+        }
+        
+        public void setIdSource(String idSource) {
+            this.idSource = idSource;
         }
     }
     

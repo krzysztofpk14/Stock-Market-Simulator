@@ -6,14 +6,14 @@ import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.Instrument;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest.OrderQuantity;
 // import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
-// import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
 import com.krzysztofpk14.app.bossaapi.model.response.UserResponse;
 
 // import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 // import java.util.concurrent.ExecutionException;
 
-public class BossaApiExample {
+public class BossaApiClientExample {
     private static int requestIdCounter = 0;
     
     public static void main(String[] args) {
@@ -26,8 +26,7 @@ public class BossaApiExample {
             
             // Logowanie
             System.out.println("Logowanie do systemu...");
-            CompletableFuture<UserResponse> loginFuture = client.login("BOS", "BOS");
-            UserResponse loginResponse = loginFuture.get(); // Czekamy na odpowiedź
+            UserResponse loginResponse = client.loginSync("BOS", "BOS");
             
             if (loginResponse.isLoginSuccessful()) {
                 System.out.println("Zalogowano pomyślnie!");
@@ -39,19 +38,18 @@ public class BossaApiExample {
                 });
                 
                 // Żądanie danych rynkowych
-                System.out.println("Żądanie danych rynkowych dla KGHM...");
+                System.out.println("Zadanie danych rynkowych dla KGHM...");
                 MarketDataRequest marketDataRequest = new MarketDataRequest();
                 marketDataRequest.setRequestId(String.valueOf(generateId())); // Konwersja int na String
                 marketDataRequest.setSubscriptionRequestType(MarketDataRequest.SNAPSHOT);
                 marketDataRequest.addInstrument("KGHM");
                 
-                client.requestMarketData(marketDataRequest, response -> {
-                    System.out.println("Otrzymano dane rynkowe dla: " + response.getInstrument().getSymbol());
+                MarketDataResponse response = client.requestMarketData(marketDataRequest);
+                System.out.println("Otrzymano dane rynkowe dla: " + response.getInstrument().getSymbol());
                     response.getMarketDataGroups().forEach(group -> {
                         System.out.println("  Typ: " + group.getMarketDataEntryType() +
                                 ", Cena: " + group.getPrice() +
                                 ", Ilość: " + group.getSize());
-                    });
                 });
                 
                 // Wysłanie zlecenia kupna

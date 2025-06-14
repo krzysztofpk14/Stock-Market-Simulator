@@ -25,7 +25,8 @@ public class UserRequest extends BaseMessage {
     // Stałe dla typów żądań
     public static final String LOGIN = "1";
     public static final String LOGOUT = "2";
-    
+    public static final String USER_STATUS = "4";
+
     // Konstruktory
     public UserRequest() {
     }

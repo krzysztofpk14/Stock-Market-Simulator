@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -21,6 +23,8 @@ public class BossaApiConnection {
     private Thread receiveThread;
     private boolean receiveRunning = false;
     private Consumer<String> messageHandler;
+
+
     
     /**
      * Nawiązuje połączenie z serwerem bossaAPI.
@@ -31,6 +35,7 @@ public class BossaApiConnection {
      */
     public void connect(String host, int port) throws IOException {
         socket = new Socket(host, port);
+        socket.setKeepAlive(true);
         input = socket.getInputStream();
         output = socket.getOutputStream();
         connected = true;
@@ -58,7 +63,55 @@ public class BossaApiConnection {
             executorService.shutdown();
         }
     }
-    
+
+    /**
+     * Wysyła komunikat do serwera i czeka na odpowiedź synchronicznie.
+     * 
+     * @param xmlMessage Komunikat XML do wysłania
+     * @param timeout Maksymalny czas oczekiwania na odpowiedź (w milisekundach)
+     * @return Odebrana odpowiedź lub null jeśli timeout
+     * @throws IOException Jeśli wystąpi błąd podczas komunikacji
+     */
+    public String sendAndReceive(String xmlMessage, int timeout) throws IOException, SocketException {
+        if (!connected) {
+            throw new IOException("Nie nawiązano połączenia z serwerem");
+        }
+
+        
+        // Ustaw timeout na sockecie
+        int originalTimeout = socket.getSoTimeout();
+        try {
+            socket.setSoTimeout(timeout);
+            
+            // // Wyślij wiadomość
+            byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
+            int messageLength = messageBytes.length;
+            output.write(messageLength);
+            output.write(messageBytes);
+            output.flush();
+            
+            // Czekaj na odpowiedź
+            StringBuilder buffer = new StringBuilder();
+            byte[] readBuffer = new byte[4096];
+            int bytesRead;
+            
+            System.out.println("Rozpoczeto odbieranie wiadomosci...");
+            while ((bytesRead = input.read(readBuffer)) != -1) {
+                String data = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
+                buffer.append(data);
+            }
+            
+            String message = buffer.substring(2);
+            buffer.delete(0, buffer.length());            
+            
+            return message; // Koniec strumienia bez odebrania odpowiedzi
+                   
+        } finally {
+            // Przywróć oryginalny timeout
+            socket.setSoTimeout(originalTimeout);
+        }
+    }
+
     /**
      * Wysyła komunikat XML do serwera.
      * 
@@ -87,8 +140,8 @@ public class BossaApiConnection {
      * 
      * @param handler Funkcja przetwarzająca odebrane komunikaty
      */
-    public void startReceiving(Consumer<String> handler) {
-        System.out.println("Rozpoczęto odbieranie wiadomości...");
+    public void startReceivingAsync(Consumer<String> handler) {
+        System.out.println("Rozpoczeto odbieranie wiadomosci...");
         if (!connected || receiveRunning) {
             return;
         }
@@ -100,60 +153,75 @@ public class BossaApiConnection {
             StringBuilder buffer = new StringBuilder();
             byte[] readBuffer = new byte[4096];
             int bytesRead;
-            
+
             try {
                 while (receiveRunning) {
                     bytesRead = input.read(readBuffer);
-                    
-                    
+
                     if (bytesRead == -1) {
                         // Koniec strumienia, serwer zamknął połączenie
-                        // System.out.println("Koniec strumienia");
-                        String message = buffer.substring(2);
-                        buffer.delete(0, buffer.length());
-                        if (messageHandler != null) {
-                                final String finalMessage = message;
-                                executorService.submit(() -> messageHandler.accept(finalMessage));
-                        }
-                        // if (messageHandler != null) {
-                        //     messageHandler.accept(message);
-                        // }
+                        System.out.println("Serwer zamknął połączenie.");
                         break;
                     }
-                    // System.out.println("Odczytano dane z gniazda: " + new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8));
-                    
+
                     String data = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
                     buffer.append(data);
-                    
-                    // Szukamy zakończeń wiadomości
-                    // int endIndex;
-                    // while ((endIndex = buffer.indexOf("\n")) != -1) {
-                    //     String message = buffer.substring(0, endIndex);
-                    //     buffer.delete(0, endIndex + 1);
 
-                    //    System.out.println("Przekazywanie wiadomości do handlera: " + message);
+                    // Sprawdź czy mamy kompletną wiadomość
+                    // W tym przykładzie zakładamy, że wiadomość ma format:
+                    // - pierwsze 4 bajty to długość wiadomości w XML
+                    // - następnie sama wiadomość XML
+                    if (buffer.length() >= 2) { // Minimalna długość sensownej wiadomości
+                        String message = buffer.toString();
 
-                    //     if (messageHandler != null) {
-                    //         messageHandler.accept(message);
-                    //     }
-                        
-                    //     // // Przetwarzamy wiadomość w puli wątków
-                    //     // if (messageHandler != null) {
-                    //     //     final String finalMessage = message;
-                    //     //     executorService.submit(() -> messageHandler.accept(finalMessage));
-                    //     // }
-                    // }
+                        // Przetwórz wiadomość i przekaż do handlera
+                        System.out.println("Przekazywanie wiadomości do handlera, długość: " + message.length());
+
+                        if (messageHandler != null) {
+                            final String finalMessage = message;
+                            // Użyj puli wątków do przetworzenia wiadomości
+                            executorService.submit(() -> messageHandler.accept(finalMessage));
+                        }
+
+                        // Wyczyść bufor, aby przygotować go na następną wiadomość
+                        buffer.setLength(0);
+                    }
                 }
             } catch (IOException e) {
                 if (receiveRunning) {
-                    // Błąd tylko jeśli nie zamykamy celowo
                     System.err.println("Błąd podczas odbierania danych: " + e.getMessage());
+
+                    // Próba ponownego nawiązania połączenia mogłaby być tutaj
+                    // Jednak wymaga to informowania klienta, więc pozostawiamy przerwanie
+
+                    // Czekaj chwilę przed kolejną próbą
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ie) {
+                        Thread.currentThread().interrupt();
+                    }
+
+                    // Jeśli połączenie jest zamknięte, przerywamy pętlę
+                    if (!isConnected()) {
+                        System.out.println("Połączenie zostało zamknięte - przerywam odbiór");
+                    }
                 }
             } finally {
-                receiveRunning = false;
+                // NIE ustawiamy tutaj receiveRunning=false, aby umożliwić ponowne uruchomienie
+                System.out.println("Zakończono wątek odbierania");
+
+                // Zamiast tego, jeśli pętla została przerwana z powodu błędu, a nie celowego zatrzymania:
+                if (receiveRunning) {
+                    receiveRunning = false;
+                    System.out.println("Odbiór wiadomości został przerwany nieoczekiwanie");
+
+                    // Tutaj można dodać kod do powiadamiania klienta o utracie połączenia
+                    // np. wywołanie callbacku onConnectionLost
+                }
             }
         });
-        
+
+        receiveThread.setName("BossaAPI-Receiver");
         receiveThread.start();
     }
     
@@ -172,6 +240,8 @@ public class BossaApiConnection {
             }
         }
     }
+
+    
     
     /**
      * Sprawdza, czy połączenie jest aktywne.
