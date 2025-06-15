@@ -5,10 +5,12 @@ import com.krzysztofpk14.app.bossaapi.model.base.FixmlMessage;
 import com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.UserRequest;
+import com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest;
 import com.krzysztofpk14.app.bossaapi.model.response.BusinessMessageReject;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
 import com.krzysztofpk14.app.bossaapi.model.response.UserResponse;
+import com.krzysztofpk14.app.bossaapi.model.response.SecurityList;
 import com.krzysztofpk14.app.bossaapi.util.FixmlGenerator;
 import com.krzysztofpk14.app.bossaapi.util.FixmlParser;
 
@@ -207,6 +209,41 @@ public class BossaApiClient {
         }
         return null;
     }
+
+    /** 
+     *  Wysyła żądanie SecurityListRequest do serwera.
+     */
+    public SecurityList requestSecurityList(SecurityListRequest request) throws IOException, JAXBException {
+        if (!isLoggedIn()) {
+            throw new IllegalStateException("Uzytkownik nie jest zalogowany");
+        }
+         
+        String requestId = request.getRequestId();
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = generateRequestId();
+            request.setRequestId(requestId);
+        }
+
+        // marketDataHandlers.put(requestId, handler);
+        System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
+
+        String requestXml = FixmlGenerator.generateXml(request);
+        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
+        System.out.println("Odpowiedź: " + response);
+
+        if (response != null) {
+            FixmlMessage fixmlMessage = FixmlParser.parse(response);
+            if (fixmlMessage != null && fixmlMessage.getMessage() instanceof SecurityList) {
+                SecurityList securityListResponse = (SecurityList) fixmlMessage.getMessage();
+                return securityListResponse;
+            } else {
+                System.err.println("Otrzymano nieprawidłową odpowiedź: " + response);
+            }
+        } else {
+            System.err.println("Brak odpowiedzi z serwera");
+        }
+        return null;
+    }
     
     /**
      * Rejestruje obsługę raportów wykonania zleceń.
@@ -295,8 +332,7 @@ public class BossaApiClient {
             
             // Usuwamy tylko dla zakończonych zleceń
             String execType = report.getExecutionType();
-            if (execType.equals(ExecutionReport.FILLED) || 
-                execType.equals(ExecutionReport.CANCELED) || 
+            if (execType.equals(ExecutionReport.CANCELING) || 
                 execType.equals(ExecutionReport.REJECTED)) {
                 orderResponses.remove(clientOrderId);
             }

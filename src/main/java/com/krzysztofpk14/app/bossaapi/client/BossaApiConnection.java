@@ -83,29 +83,63 @@ public class BossaApiConnection {
         try {
             socket.setSoTimeout(timeout);
             
-            // // Wyślij wiadomość
+            // Wyślij wiadomość
             byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
             int messageLength = messageBytes.length;
-            output.write(messageLength);
+
+            // Wyślij długość jako 4 bajty (big-endian)
+            output.write((messageLength >> 24) & 0xFF);
+            output.write((messageLength >> 16) & 0xFF);
+            output.write((messageLength >> 8) & 0xFF);
+            output.write(messageLength & 0xFF);
+
+            // System.out.println("Wysłano wiadomość o długości: " + messageLength);
             output.write(messageBytes);
             output.flush();
             
-            // Czekaj na odpowiedź
-            StringBuilder buffer = new StringBuilder();
-            byte[] readBuffer = new byte[4096];
-            int bytesRead;
+            // Najpierw odczytaj 4 bajty długości
+            byte[] lengthBuffer = new byte[4];
+            int bytesRead = 0;
             
-            System.out.println("Rozpoczeto odbieranie wiadomosci...");
-            while ((bytesRead = input.read(readBuffer)) != -1) {
-                String data = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
-                buffer.append(data);
+            // Czekaj na odczyt całego nagłówka długości (4 bajty)
+            while (bytesRead < 4) {
+                int read = input.read(lengthBuffer, bytesRead, 4 - bytesRead);
+                if (read == -1) {
+                    throw new IOException("Połączenie zamknięte podczas odczytu długości wiadomości");
+                }
+                bytesRead += read;
             }
             
-            String message = buffer.substring(2);
-            buffer.delete(0, buffer.length());            
+            // Oblicz długość wiadomości z 4 bajtów
+            int responseLength = ((lengthBuffer[0] & 0xFF) << 24) |
+                                ((lengthBuffer[1] & 0xFF) << 16) |
+                                ((lengthBuffer[2] & 0xFF) << 8) |
+                                (lengthBuffer[3] & 0xFF);
             
-            return message; // Koniec strumienia bez odebrania odpowiedzi
-                   
+            // System.out.println("Odczytano długość odpowiedzi: " + responseLength + " bajtów");
+            
+            // Sprawdź czy długość ma sens
+            if (responseLength <= 0 || responseLength > 10_000_000) { // 10MB jako rozsądny limit
+                throw new IOException("Nieprawidłowa długość odpowiedzi: " + responseLength);
+            }
+            byte[] responseBuffer = new byte[responseLength];
+            bytesRead = 0;
+            
+            // Czekaj na odczyt całej wiadomości
+            while (bytesRead < responseLength) {
+                int read = input.read(responseBuffer, bytesRead, responseLength - bytesRead);
+                if (read == -1) {
+                    throw new IOException("Połączenie zamknięte podczas odczytu treści wiadomości");
+                }
+                bytesRead += read;
+            }
+            
+            // Konwertuj odpowiedź na string
+            String response = new String(responseBuffer, StandardCharsets.UTF_8);
+            // System.out.println("Odebrano odpowiedź o długości: " + bytesRead + " bajtów");
+            
+            return response;
+  
         } finally {
             // Przywróć oryginalny timeout
             socket.setSoTimeout(originalTimeout);
@@ -122,17 +156,22 @@ public class BossaApiConnection {
         if (!connected) {
             throw new IOException("Nie nawiązano połączenia z serwerem");
         }
-
-        // Convert the message to bytes
+            
+        // Wyślij wiadomość
         byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
-
-        // Send the length of the message as an integer (4 bytes)
         int messageLength = messageBytes.length;
-        output.write(messageLength);
 
-        // Send the actual message
+        // Wyślij długość jako 4 bajty (big-endian)
+        output.write((messageLength >> 24) & 0xFF);
+        output.write((messageLength >> 16) & 0xFF);
+        output.write((messageLength >> 8) & 0xFF);
+        output.write(messageLength & 0xFF);
+
+        // System.out.println("Wysłano wiadomość o długości: " + messageLength);
         output.write(messageBytes);
         output.flush();
+
+
     }
     
     /**

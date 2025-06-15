@@ -63,7 +63,7 @@ public class BossaApiServer {
         try {
             while (running) {
                 Socket clientSocket = serverSocket.accept();
-                System.out.println("Nowe połączenie od: " + clientSocket.getInetAddress());
+                System.out.println("Nowe polaczenie od: " + clientSocket.getInetAddress());
                 
                 // Utwórz nową sesję klienta
                 ClientSession session = new ClientSession(clientSocket, sessionManager, orderManager, 

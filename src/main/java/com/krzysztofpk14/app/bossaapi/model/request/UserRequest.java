@@ -7,6 +7,7 @@ import com.krzysztofpk14.app.bossaapi.model.base.BaseMessage;
  * Klasa reprezentująca żądanie użytkownika (logowanie, wylogowanie).
  * Odpowiada tagowi UserReq w FIXML.
  */
+
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserRequest extends BaseMessage {
     
@@ -14,7 +15,7 @@ public class UserRequest extends BaseMessage {
     private String userReqID;
     
     @XmlAttribute(name = "UserReqTyp")
-    private String userRequestType;  // 1=logowanie, 2=wylogowanie
+    private String userRequestType;
     
     @XmlAttribute(name = "Username")
     private String username;

@@ -19,6 +19,15 @@ public class MarketDataResponse extends BaseMessage {
     
     @XmlElement(name = "MktDataGrp")
     private List<MarketDataGroup> marketDataGroups;
+
+    @XmlElement(name = "RespType")
+    private String responseType;  // Typ odpowiedzi, np. "0" dla pełnego odświeżenia
+
+
+    // Stałe dla typów danych rynkowych
+    public static final String TRADE = "0";
+    public static final String FULL_REFRESH = "1";
+    public static final String UNSOLICITED_INDICATOR = "2";
     
     // Konstruktory
     public MarketDataResponse() {
@@ -47,6 +56,14 @@ public class MarketDataResponse extends BaseMessage {
     
     public void setMarketDataGroups(List<MarketDataGroup> marketDataGroups) {
         this.marketDataGroups = marketDataGroups;
+    }
+
+    public String getResponseType() {
+        return responseType;
+    }
+
+    public void setResponseType(String responseType) {
+        this.responseType = responseType;
     }
     
     @Override

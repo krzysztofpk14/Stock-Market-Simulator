@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.krzysztofpk14.app.bossaapi.util.FixmlGeneratorTest
+-------------------------------------------------------------------------------
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.064 s -- in com.krzysztofpk14.app.bossaapi.util.FixmlGeneratorTest

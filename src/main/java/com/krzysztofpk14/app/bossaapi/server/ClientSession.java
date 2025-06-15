@@ -111,7 +111,7 @@ public class ClientSession {
                 
                 int length = ((lengthBuffer[0] & 0xFF) << 24) | 
                              ((lengthBuffer[1] & 0xFF) << 16) | 
-                             ((lengthBuffer[2] & 0xFF) << 8) | 
+                             ((lengthBuffer[2] & 0xFF) << 8)  | 
                              (lengthBuffer[3] & 0xFF);
                 
                 // Sprawdź czy długość jest sensowna
@@ -119,7 +119,6 @@ public class ClientSession {
                     System.err.println("Otrzymano nieprawidłową długość wiadomości: " + length);
                     continue;
                 }
-                
                 // Odczytaj treść wiadomości
                 byte[] messageBuffer = new byte[length];
                 if (readFully(messageBuffer) != length) {
@@ -127,7 +126,7 @@ public class ClientSession {
                 }
                 
                 String message = new String(messageBuffer, StandardCharsets.UTF_8);
-                System.out.println("Sesja " + sessionId + " otrzymała: " + message);
+                // System.out.println("Sesja " + sessionId + " otrzymała: " + message);
                 
                 // Przetwórz wiadomość
                 processMessage(message);
@@ -239,7 +238,7 @@ public class ClientSession {
         output.write(messageBytes);
         output.flush();
         
-        System.out.println("Sesja " + sessionId + " wysłała: " + message);
+        // System.out.println("Sesja " + sessionId + " wyslala: " + message);
     }
     
     /**
@@ -303,7 +302,6 @@ public class ClientSession {
         String requestType = request.getUserRequestType();
         
         if ("1".equals(requestType)) { // Login
-            // Sprawdź poświadczenia (w prawdziwej implementacji weryfikacja z bazą danych)
             boolean loginSuccessful = validateLogin(request.getUsername(), request.getPassword());
             
             UserResponse response = new UserResponse();
@@ -312,6 +310,8 @@ public class ClientSession {
             if (loginSuccessful) {
                 response.setUserStatus(UserResponse.LOGGED_IN);
                 response.setUserStatusText("Zalogowano pomyślnie");
+                response.setUsername(request.getUsername());
+                response.setMktDepth(UserResponse.FIVE_OFFERS);
                 this.username = request.getUsername();
                 this.authenticated = true;
             } else {
@@ -324,12 +324,22 @@ public class ClientSession {
             UserResponse response = new UserResponse();
             response.setUserReqID(request.getUserReqID());
             response.setUserStatus(UserResponse.LOGGED_OUT);
+            response.setUsername(this.username);
             response.setUserStatusText("Wylogowano pomyślnie");
             
             // Wyczyść stan sesji
             this.authenticated = false;
             this.username = null;
             
+            sendMessage(response);
+        } else if ("4".equals(requestType)) { // Check status
+            UserResponse response = new UserResponse();
+            response.setUserReqID(request.getUserReqID());
+            response.setUsername(this.username);
+            response.setUserStatus(authenticated ? UserResponse.LOGGED_IN : UserResponse.INVESTOR_OFFLINE);
+            response.setUserStatusText(authenticated ? "Zalogowany" : "Niezalogowany");
+            response.setMktDepth(UserResponse.FIVE_OFFERS);
+
             sendMessage(response);
         } else {
             sendReject("Nieobsługiwany typ żądania użytkownika: " + requestType, "UserReq");
@@ -344,8 +354,7 @@ public class ClientSession {
      * @return true jeśli dane są poprawne
      */
     private boolean validateLogin(String username, String password) {
-        // W rzeczywistej implementacji sprawdzenie w bazie danych
-        // Tutaj uproszczone sprawdzenie
+        // W dokumentacji aplikacji jest stały login i hasło
         return "BOS".equals(username) && "BOS".equals(password);
     }
     
@@ -423,7 +432,7 @@ public class ClientSession {
      */
     private void handleExecutionReport(ExecutionReport report) {
         // Wyślij raport tylko jeśli dotyczy tego klienta
-        if (authenticated && username != null && username.equals(report.getUsername())) {
+        if (authenticated) {
             sendMessage(report);
         }
     }
@@ -460,9 +469,9 @@ public class ClientSession {
             System.out.println("Zamykanie sesji: " + sessionId);
             
             // Wyrejestruj odbiorców zdarzeń
-            marketDataManager.unregisterMarketDataListener(this);
+            marketDataManager.unregisterMarketDataListener(this::handleMarketDataEvent);
             marketDataManager.unsubscribeAllMarketData(this);
-            orderManager.unregisterExecutionListener(this);
+            orderManager.unregisterExecutionListener(this::handleExecutionReport);
             
             // Usuń sesję z managera
             sessionManager.removeSession(this);

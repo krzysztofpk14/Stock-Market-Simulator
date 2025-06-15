@@ -205,7 +205,7 @@ public class MarketDataManager {
         group.setMarketDataEntryType(MarketDataResponse.TRADE); // Transakcja
         group.setPrice(price);
         group.setSize("100"); // Przykładowy wolumen
-        group.setDateTime(getCurrentTimeFormatted());
+        group.setTime(getCurrentTimeFormatted());
         
         List<MarketDataResponse.MarketDataGroup> groups = new ArrayList<>();
         groups.add(group);

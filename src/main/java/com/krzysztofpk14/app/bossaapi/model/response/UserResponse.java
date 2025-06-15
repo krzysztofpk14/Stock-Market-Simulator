@@ -23,7 +23,7 @@ public class UserResponse extends BaseMessage {
     private String username;
 
     @XmlAttribute(name = "MktDepth") //int, Ilość ofert, 0 -> 5 ofert (rezerwa na cały arkusz), 1-> 1 oferta, 5-> 5 ofert
-    private int mktDepth;
+    private String mktDepth;
     
     // Stałe dla statusów
     public static final String LOGGED_IN = "1";
@@ -33,8 +33,12 @@ public class UserResponse extends BaseMessage {
     public static final String INVESTOR_OFFLINE = "5";
     public static final String OTHER = "6";
     public static final String NOL_OFFLINE = "7";
-    
-    
+
+    // Stałe dla MktDepth
+    public static final String FULL_BOOK = "0"; // 5 ofert (rezerwa na cały arkusz)
+    public static final String TOP_OF_BOOK = "1"; // 1 oferta
+    public static final String FIVE_OFFERS = "5"; // 5 ofert
+
     // Konstruktory
     public UserResponse() {
     }
@@ -60,7 +64,7 @@ public class UserResponse extends BaseMessage {
         return userStatusText;
     }
 
-    public int getMktDepth() {
+    public String getMktDepth() {
         return mktDepth;
     }
     
@@ -76,7 +80,7 @@ public class UserResponse extends BaseMessage {
         this.username = username;
     }
 
-    public void setMktDepth(int mktDepth) {
+    public void setMktDepth(String mktDepth) {
         this.mktDepth = mktDepth;
     }
     

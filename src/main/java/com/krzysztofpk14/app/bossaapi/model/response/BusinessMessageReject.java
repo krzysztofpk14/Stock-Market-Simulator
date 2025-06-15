@@ -1,20 +1,19 @@
 package com.krzysztofpk14.app.bossaapi.model.response;
 
+import jakarta.xml.bind.annotation.*;
 import com.krzysztofpk14.app.bossaapi.model.base.BaseMessage;
-
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
 
 /**
  * Klasa reprezentująca wiadomość BusinessMessageReject.
  */
-@XmlRootElement(name = "BusinessMessageReject")
+// @XmlRootElement(name = "BusinessMessageReject")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class BusinessMessageReject extends BaseMessage {
 
     @XmlElement(name = "RefMsgType")
     private String refMsgType;
 
-    @XmlElement(name = "BusinessRejectReason")
+    @XmlElement(name = "BizRejRsn")
     private String businessRejectReason;
 
     @XmlElement(name = "Text")
@@ -67,15 +66,15 @@ public class BusinessMessageReject extends BaseMessage {
 
     @Override
     public String getMessageType() {
-        return "BusinessMessageReject";
+        return "BizMsgRej";
     }
 
-    @Override
-    public String toString() {
-        return "BusinessMessageReject{" +
-                "refMsgType='" + refMsgType + '\'' +
-                ", businessRejectReason='" + businessRejectReason + '\'' +
-                ", text='" + text + '\'' +
-                '}';
-    }
+    // @Override
+    // public String toString() {
+    //     return "BusinessMessageReject{" +
+    //             "refMsgType='" + refMsgType + '\'' +
+    //             ", businessRejectReason='" + businessRejectReason + '\'' +
+    //             ", text='" + text + '\'' +
+    //             '}';
+    // }
 }

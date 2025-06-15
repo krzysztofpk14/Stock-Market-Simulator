@@ -1,0 +1,66 @@
+-------------------------------------------------------------------------------
+Test set: com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest
+-------------------------------------------------------------------------------
+Tests run: 6, Failures: 1, Errors: 3, Skipped: 0, Time elapsed: 21.60 s <<< FAILURE! -- in com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest
+com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testMarketDataSubscription -- Time elapsed: 10.02 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Powinniśmy otrzymać aktualizacje danych rynkowych ==> expected: <true> but was: <false>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertTrue.failNotTrue(AssertTrue.java:63)
+	at org.junit.jupiter.api.AssertTrue.assertTrue(AssertTrue.java:36)
+	at org.junit.jupiter.api.Assertions.assertTrue(Assertions.java:214)
+	at com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testMarketDataSubscription(BossaApiIntegrationTest.java:173)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testSecurityListRequest -- Time elapsed: 0.014 s <<< ERROR!
+jakarta.xml.bind.MarshalException
+ - with linked exception:
+[com.sun.istack.SAXException2: jakarta.xml.bind.JAXBException: class com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest nor any of its super class is known to this context.
+jakarta.xml.bind.JAXBException: class com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest nor any of its super class is known to this context.]
+	at org.glassfish.jaxb.runtime.v2.runtime.MarshallerImpl.write(MarshallerImpl.java:268)
+	at org.glassfish.jaxb.runtime.v2.runtime.MarshallerImpl.marshal(MarshallerImpl.java:197)
+	at jakarta.xml.bind.helpers.AbstractMarshallerImpl.marshal(AbstractMarshallerImpl.java:109)
+	at com.krzysztofpk14.app.bossaapi.util.FixmlGenerator.generateXml(FixmlGenerator.java:48)
+	at com.krzysztofpk14.app.bossaapi.util.FixmlGenerator.generateXml(FixmlGenerator.java:71)
+	at com.krzysztofpk14.app.bossaapi.client.BossaApiClient.requestSecurityList(BossaApiClient.java:230)
+	at com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testSecurityListRequest(BossaApiIntegrationTest.java:190)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+Caused by: com.sun.istack.SAXException2: jakarta.xml.bind.JAXBException: class com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest nor any of its super class is known to this context.
+jakarta.xml.bind.JAXBException: class com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest nor any of its super class is known to this context.
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.reportError(XMLSerializer.java:211)
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.reportError(XMLSerializer.java:226)
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.childAsXsiType(XMLSerializer.java:616)
+	at org.glassfish.jaxb.runtime.v2.runtime.property.SingleElementNodeProperty.serializeBody(SingleElementNodeProperty.java:125)
+	at org.glassfish.jaxb.runtime.v2.runtime.ClassBeanInfoImpl.serializeBody(ClassBeanInfoImpl.java:334)
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.childAsSoleContent(XMLSerializer.java:556)
+	at org.glassfish.jaxb.runtime.v2.runtime.ClassBeanInfoImpl.serializeRoot(ClassBeanInfoImpl.java:314)
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.childAsRoot(XMLSerializer.java:456)
+	at org.glassfish.jaxb.runtime.v2.runtime.MarshallerImpl.write(MarshallerImpl.java:265)
+	... 9 more
+Caused by: jakarta.xml.bind.JAXBException: class com.krzysztofpk14.app.bossaapi.model.request.SecurityListRequest nor any of its super class is known to this context.
+	at org.glassfish.jaxb.runtime.v2.runtime.JAXBContextImpl.getBeanInfo(JAXBContextImpl.java:543)
+	at org.glassfish.jaxb.runtime.v2.runtime.XMLSerializer.childAsXsiType(XMLSerializer.java:611)
+	... 15 more
+
+com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testOrderExecution -- Time elapsed: 5.007 s <<< ERROR!
+java.util.concurrent.TimeoutException
+	at java.base/java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:2006)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2141)
+	at com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testOrderExecution(BossaApiIntegrationTest.java:230)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
+com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testLogout -- Time elapsed: 5.004 s <<< ERROR!
+java.util.concurrent.TimeoutException
+	at java.base/java.util.concurrent.CompletableFuture.timedGet(CompletableFuture.java:2006)
+	at java.base/java.util.concurrent.CompletableFuture.get(CompletableFuture.java:2141)
+	at com.krzysztofpk14.app.bossaapi.BossaApiIntegrationTest.testLogout(BossaApiIntegrationTest.java:253)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1604)
+
