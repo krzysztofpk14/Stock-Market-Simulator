@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
@@ -235,7 +234,7 @@ public class MarketDataManager {
         
         subscriptions.computeIfAbsent(requestId, k -> new ArrayList<>()).add(session);
         
-        System.out.println("Dodano subskrypcję danych rynkowych dla requestId: " + requestId);
+        // System.out.println("Dodano subskrypcję danych rynkowych dla requestId: " + requestId);
     }
     
     /**
@@ -245,7 +244,7 @@ public class MarketDataManager {
      */
     public void unsubscribeMarketData(String requestId) {
         subscriptions.remove(requestId);
-        System.out.println("Usunięto subskrypcję danych rynkowych dla requestId: " + requestId);
+        // System.out.println("Usunięto subskrypcję danych rynkowych dla requestId: " + requestId);
     }
     
     /**

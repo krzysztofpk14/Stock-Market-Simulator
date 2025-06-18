@@ -72,31 +72,50 @@ public class BossaApiConnection {
      * @return Odebrana odpowiedź lub null jeśli timeout
      * @throws IOException Jeśli wystąpi błąd podczas komunikacji
      */
-    public String sendAndReceive(String xmlMessage, int timeout) throws IOException, SocketException {
+    public String sendAndReceive(String xmlMessage) throws IOException, SocketException {
+        sendMessage(xmlMessage);
+        String response = receiveMessage();
+        // System.out.println("Wiadomosc przez socket synchroniczny");
+    
+        return response;
+    }
+
+    /**
+     * Wysyła komunikat XML do serwera.
+     * 
+     * @param xmlMessage Komunikat XML do wysłania
+     * @throws IOException Jeśli wystąpi błąd podczas wysyłania
+     */
+    public void sendMessage(String xmlMessage) throws IOException {
         if (!connected) {
             throw new IOException("Nie nawiązano połączenia z serwerem");
         }
-
-        
-        // Ustaw timeout na sockecie
-        int originalTimeout = socket.getSoTimeout();
-        try {
-            socket.setSoTimeout(timeout);
             
-            // Wyślij wiadomość
-            byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
-            int messageLength = messageBytes.length;
+        // Wyślij wiadomość
+        byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
+        int messageLength = messageBytes.length;
 
-            // Wyślij długość jako 4 bajty (big-endian)
-            output.write((messageLength >> 24) & 0xFF);
-            output.write((messageLength >> 16) & 0xFF);
-            output.write((messageLength >> 8) & 0xFF);
-            output.write(messageLength & 0xFF);
+        // Wyślij długość jako 4 bajty (big-endian)
+        output.write((messageLength >> 24) & 0xFF);
+        output.write((messageLength >> 16) & 0xFF);
+        output.write((messageLength >> 8) & 0xFF);
+        output.write(messageLength & 0xFF);
 
-            // System.out.println("Wysłano wiadomość o długości: " + messageLength);
-            output.write(messageBytes);
-            output.flush();
-            
+        // System.out.println("Wysłano wiadomość o długości: " + messageLength);
+        output.write(messageBytes);
+        output.flush();
+
+
+    }
+
+    /**
+     * Przetwarza odpowiedź serwera.
+     * 
+     * @param xmlMessage Komunikat XML do wysłania
+     * @return Odebrana odpowiedź lub null jeśli wystąpił błąd
+     */
+    public String receiveMessage() {
+        try{
             // Najpierw odczytaj 4 bajty długości
             byte[] lengthBuffer = new byte[4];
             int bytesRead = 0;
@@ -139,39 +158,10 @@ public class BossaApiConnection {
             // System.out.println("Odebrano odpowiedź o długości: " + bytesRead + " bajtów");
             
             return response;
-  
-        } finally {
-            // Przywróć oryginalny timeout
-            socket.setSoTimeout(originalTimeout);
-        }
-    }
-
-    /**
-     * Wysyła komunikat XML do serwera.
-     * 
-     * @param xmlMessage Komunikat XML do wysłania
-     * @throws IOException Jeśli wystąpi błąd podczas wysyłania
-     */
-    public void sendMessage(String xmlMessage) throws IOException {
-        if (!connected) {
-            throw new IOException("Nie nawiązano połączenia z serwerem");
-        }
-            
-        // Wyślij wiadomość
-        byte[] messageBytes = xmlMessage.getBytes(StandardCharsets.UTF_8);
-        int messageLength = messageBytes.length;
-
-        // Wyślij długość jako 4 bajty (big-endian)
-        output.write((messageLength >> 24) & 0xFF);
-        output.write((messageLength >> 16) & 0xFF);
-        output.write((messageLength >> 8) & 0xFF);
-        output.write(messageLength & 0xFF);
-
-        // System.out.println("Wysłano wiadomość o długości: " + messageLength);
-        output.write(messageBytes);
-        output.flush();
-
-
+        } catch (IOException e) {
+            System.err.println("Błąd podczas odbierania wiadomości: " + e.getMessage());
+            return null; // lub można rzucić 
+        }    
     }
     
     /**
@@ -189,74 +179,44 @@ public class BossaApiConnection {
         receiveRunning = true;
         
         receiveThread = new Thread(() -> {
-            StringBuilder buffer = new StringBuilder();
-            byte[] readBuffer = new byte[4096];
-            int bytesRead;
-
             try {
                 while (receiveRunning) {
-                    bytesRead = input.read(readBuffer);
-
-                    if (bytesRead == -1) {
-                        // Koniec strumienia, serwer zamknął połączenie
-                        System.out.println("Serwer zamknął połączenie.");
-                        break;
-                    }
-
-                    String data = new String(readBuffer, 0, bytesRead, StandardCharsets.UTF_8);
-                    buffer.append(data);
-
-                    // Sprawdź czy mamy kompletną wiadomość
-                    // W tym przykładzie zakładamy, że wiadomość ma format:
-                    // - pierwsze 4 bajty to długość wiadomości w XML
-                    // - następnie sama wiadomość XML
-                    if (buffer.length() >= 2) { // Minimalna długość sensownej wiadomości
-                        String message = buffer.toString();
-
-                        // Przetwórz wiadomość i przekaż do handlera
-                        System.out.println("Przekazywanie wiadomości do handlera, długość: " + message.length());
-
-                        if (messageHandler != null) {
-                            final String finalMessage = message;
-                            // Użyj puli wątków do przetworzenia wiadomości
-                            executorService.submit(() -> messageHandler.accept(finalMessage));
-                        }
-
-                        // Wyczyść bufor, aby przygotować go na następną wiadomość
-                        buffer.setLength(0);
-                    }
-                }
-            } catch (IOException e) {
-                if (receiveRunning) {
-                    System.err.println("Błąd podczas odbierania danych: " + e.getMessage());
-
-                    // Próba ponownego nawiązania połączenia mogłaby być tutaj
-                    // Jednak wymaga to informowania klienta, więc pozostawiamy przerwanie
-
-                    // Czekaj chwilę przed kolejną próbą
-                    try {
+                    // Użyj istniejącej metody receiveMessage() do odczytania wiadomości
+                    String message = receiveMessage();
+                    // System.out.println("Wiadomość przez socket asynchroniczny");
+                    
+                    // Jeśli odczytano kompletną wiadomość, przekaż ją do handlera
+                    if (message != null && messageHandler != null) {
+                        // Użyj puli wątków do przetworzenia wiadomości
+                        final String finalMessage = message;
+                        executorService.submit(() -> messageHandler.accept(finalMessage));
+                    } else if (message == null) {
+                        // Jeśli receiveMessage zwraca null, to wystąpił błąd odczytu
+                        // Wstrzymaj chwilę pętlę przed ponowną próbą
                         Thread.sleep(1000);
-                    } catch (InterruptedException ie) {
-                        Thread.currentThread().interrupt();
-                    }
-
-                    // Jeśli połączenie jest zamknięte, przerywamy pętlę
-                    if (!isConnected()) {
-                        System.out.println("Połączenie zostało zamknięte - przerywam odbiór");
+                        
+                        // Sprawdź czy połączenie nadal istnieje
+                        if (!isConnected()) {
+                            System.out.println("Połączenie zostało zamknięte - przerywam odbiór");
+                            break;
+                        }
                     }
                 }
+            } catch (InterruptedException e) {
+                // Wątek został przerwany, zakończ działanie
+                Thread.currentThread().interrupt();
+                System.out.println("Wątek odbierania został przerwany");
+            } catch (Exception e) {
+                // Obsługa innych wyjątków, które mogą się pojawić
+                System.err.println("Błąd w wątku odbierania: " + e.getMessage());
             } finally {
-                // NIE ustawiamy tutaj receiveRunning=false, aby umożliwić ponowne uruchomienie
-                System.out.println("Zakończono wątek odbierania");
-
-                // Zamiast tego, jeśli pętla została przerwana z powodu błędu, a nie celowego zatrzymania:
+                // Jeśli pętla została przerwana z powodu błędu, a nie celowego zatrzymania:
                 if (receiveRunning) {
                     receiveRunning = false;
                     System.out.println("Odbiór wiadomości został przerwany nieoczekiwanie");
-
                     // Tutaj można dodać kod do powiadamiania klienta o utracie połączenia
-                    // np. wywołanie callbacku onConnectionLost
                 }
+                System.out.println("Zakończono wątek odbierania");
             }
         });
 

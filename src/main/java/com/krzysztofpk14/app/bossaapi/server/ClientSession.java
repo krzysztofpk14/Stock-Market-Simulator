@@ -89,7 +89,7 @@ public class ClientSession {
             sendThread.setName("BossaAPI-Session-" + sessionId + "-Sender");
             sendThread.start();
             
-            System.out.println("Rozpoczęto sesję: " + sessionId);
+            System.out.println("Rozpoczeto sesje: " + sessionId);
         } catch (IOException e) {
             System.err.println("Błąd podczas inicjalizacji sesji: " + e.getMessage());
             close();

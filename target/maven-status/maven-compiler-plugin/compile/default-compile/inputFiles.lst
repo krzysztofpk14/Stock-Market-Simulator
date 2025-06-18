@@ -23,3 +23,13 @@ C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk
 C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\BossaApiClientExample.java
 C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\BossaApiConnectionExample.java
 C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\BossaApiServerExample.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\AbstractInvestmentStrategy.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\InvestmentStrategy.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\MovingAverageCrossoverStrategy.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\Position.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\RSIStrategy.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\StrategyManager.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\StrategyParameters.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\StrategyStatistics.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\strategy\StrategyStatus.java
+C:\Users\krzyc\Documents\Personal finance\Java_app\src\main\java\com\krzysztofpk14\app\TradingStrategyExample.java

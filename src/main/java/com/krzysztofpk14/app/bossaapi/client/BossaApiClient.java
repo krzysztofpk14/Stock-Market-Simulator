@@ -17,9 +17,8 @@ import com.krzysztofpk14.app.bossaapi.util.FixmlParser;
 import jakarta.xml.bind.JAXBException;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
-// import java.util.UUID;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -31,9 +30,11 @@ public class BossaApiClient {
     private final BossaApiConnection connection;
     private final Map<String, CompletableFuture<UserResponse>> loginResponses = new ConcurrentHashMap<>();
     private final Map<String, CompletableFuture<ExecutionReport>> orderResponses = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<MarketDataResponse>> marketDataFutures = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<ExecutionReport>> orderFutures = new ConcurrentHashMap<>();
     
     private final Map<String, Consumer<MarketDataResponse>> marketDataHandlers = new ConcurrentHashMap<>();
-    private final Map<String, Consumer<ExecutionReport>> executionReportHandlers = new HashMap<>();
+    private final Map<String, Consumer<ExecutionReport>> executionReportHandlers = new ConcurrentHashMap<>();
     
     private boolean loggedIn = false;
     private String username;
@@ -54,7 +55,7 @@ public class BossaApiClient {
      */
     public void connect(String host, int port) throws IOException {
         connection.connect(host, port);
-        // connection.startReceiving(this::handleMessage);
+        connection.startReceivingAsync(this::handleMessage);
     }
     
     /**
@@ -99,7 +100,7 @@ public class BossaApiClient {
         String requestId = generateRequestId();
         UserRequest request = new UserRequest(requestId, username, password);
         String requestXml = FixmlGenerator.generateXml(request);
-        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
+        String response = connection.sendAndReceive(requestXml);
         System.out.println("Odpowiedź: " + response);
 
         if (response != null) {
@@ -114,7 +115,6 @@ public class BossaApiClient {
                 return userResp;
             }
         }
-
         return null;
     }
     
@@ -164,23 +164,27 @@ public class BossaApiClient {
         }
         
         CompletableFuture<ExecutionReport> future = new CompletableFuture<>();
-        orderResponses.put(clientOrderId, future);
+        orderFutures.put(clientOrderId, future);
         
         sendMessage(order);
         return future;
     }
-    
-    /**
-     * Wysyła żądanie danych rynkowych.
+
+
+
+     /**
+     * Subskrybuje dane rynkowe asynchronicznie.
      * 
      * @param request Obiekt żądania danych rynkowych
-     * @param handler Obsługa otrzymywanych danych rynkowych
+     * @return Future z odpowiedzią na żądanie subskrypcji
      * @throws IOException Jeśli wystąpi błąd połączenia
      * @throws JAXBException Jeśli wystąpi błąd generowania XML
      */
-    public MarketDataResponse requestMarketData(MarketDataRequest request) throws IOException, JAXBException {
+    public CompletableFuture<MarketDataResponse> subscribeMarketData(MarketDataRequest request) throws IOException, JAXBException {
         if (!isLoggedIn()) {
-            throw new IllegalStateException("Uzytkownik nie jest zalogowany");
+            CompletableFuture<MarketDataResponse> future = new CompletableFuture<>();
+            future.completeExceptionally(new IllegalStateException("Użytkownik nie jest zalogowany"));
+            return future;
         }
          
         String requestId = request.getRequestId();
@@ -189,27 +193,44 @@ public class BossaApiClient {
             request.setRequestId(requestId);
         }
 
-        // marketDataHandlers.put(requestId, handler);
-        System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
-
-        String requestXml = FixmlGenerator.generateXml(request);
-        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
-        System.out.println("Odpowiedź: " + response);
-
-        if (response != null) {
-            FixmlMessage fixmlMessage = FixmlParser.parse(response);
-            if (fixmlMessage != null && fixmlMessage.getMessage() instanceof MarketDataResponse) {
-                MarketDataResponse marketDataResponse = (MarketDataResponse) fixmlMessage.getMessage();
-                return marketDataResponse;
-            } else {
-                System.err.println("Otrzymano nieprawidłową odpowiedź: " + response);
-            }
-        } else {
-            System.err.println("Brak odpowiedzi z serwera");
-        }
-        return null;
+        CompletableFuture<MarketDataResponse> future = new CompletableFuture<>();
+        marketDataFutures.put(requestId, future);
+        
+        // System.out.println("Wysyłanie żądania subskrypcji danych rynkowych: " + requestId);
+        sendMessage(request);
+        
+        return future;
     }
+    
+    /**
+     * Anuluje subskrypcję danych rynkowych.
+     * 
+     * @param request Obiekt żądania anulowania subskrypcji
+     * @return Future z odpowiedzią na żądanie anulowania subskrypcji
+     * @throws IOException Jeśli wystąpi błąd połączenia
+     * @throws JAXBException Jeśli wystąpi błąd generowania XML
+     */
+    public CompletableFuture<MarketDataResponse> unsubscribeMarketData(MarketDataRequest request) throws IOException, JAXBException {
+        if (!isLoggedIn()) {
+            CompletableFuture<MarketDataResponse> future = new CompletableFuture<>();
+            future.completeExceptionally(new IllegalStateException("Użytkownik nie jest zalogowany"));
+            return future;
+        }
+         
+        String requestId = request.getRequestId();
+        if (requestId == null || requestId.isEmpty()) {
+            requestId = generateRequestId();
+            request.setRequestId(requestId);
+        }
 
+        CompletableFuture<MarketDataResponse> future = new CompletableFuture<>();
+        marketDataFutures.put(requestId, future);
+        
+        System.out.println("Wysyłanie żądania anulowania subskrypcji danych rynkowych: " + requestId);
+        sendMessage(request);
+        
+        return future;
+    }
     /** 
      *  Wysyła żądanie SecurityListRequest do serwera.
      */
@@ -228,7 +249,7 @@ public class BossaApiClient {
         System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
 
         String requestXml = FixmlGenerator.generateXml(request);
-        String response = connection.sendAndReceive(requestXml, 5000); // Timeout 5 sekund
+        String response = connection.sendAndReceive(requestXml);
         System.out.println("Odpowiedź: " + response);
 
         if (response != null) {
@@ -254,6 +275,15 @@ public class BossaApiClient {
         executionReportHandlers.put("default", handler);
     }
     
+        /**
+     * Rejestruje obsługę raportów wykonania zleceń.
+     * 
+     * @param handler Funkcja obsługująca raporty wykonania
+     */
+    public void registerMarketDataHandler(Consumer<MarketDataResponse> handler) {
+        marketDataHandlers.put("default", handler);
+    }
+
     /**
      * Wysyła wiadomość do serwera.
      * 
@@ -263,7 +293,7 @@ public class BossaApiClient {
      */
     private void sendMessage(BaseMessage message) throws IOException, JAXBException {
         String xml = FixmlGenerator.generateXml(message);
-        System.out.println("Wysyłanie wiadomości: " + xml);
+        // System.out.println("Wysyłanie wiadomości: " + xml);
         connection.sendMessage(xml);
     }
     
@@ -273,12 +303,12 @@ public class BossaApiClient {
      * @param xml Treść wiadomości XML
      */
     private void handleMessage(String xml) {
-        System.out.println("Odebrano wiadomość:" + xml);
+        // System.out.println("Odebrano wiadomość:" + xml);
 
         try {
             FixmlMessage message = FixmlParser.parse(xml);
             BaseMessage baseMessage = message.getMessage();
-            System.out.println("Typ wiadomości: " + baseMessage.getMessageType());
+            // System.out.println("Typ wiadomości: " + baseMessage.getMessageType());
             
             if (baseMessage instanceof UserResponse) {
                 handleUserResponse((UserResponse) baseMessage);
@@ -392,6 +422,6 @@ public class BossaApiClient {
      * @return Unikalny identyfikator
      */
     private String generateRequestId() {
-        return "5";
+        return UUID.randomUUID().toString();
     }
 }
