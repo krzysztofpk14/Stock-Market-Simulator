@@ -105,6 +105,11 @@ public class SecurityList extends BaseMessage {
     public String getMessageType() {
         return "SecList";
     }
+
+    @Override
+    public String getMessageId() {
+        return requestId;
+    }
     
     /**
      * Sprawdza czy odpowiedź zawiera błąd

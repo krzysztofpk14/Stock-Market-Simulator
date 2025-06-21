@@ -195,4 +195,13 @@ public class StrategyParameters {
     public Object getParam(String key) {
         return parameters.get(key);
     }
+
+    /**
+     * Zwraca wszystkie parametry strategii.
+     * 
+     * @return Mapowanie kluczy na wartości parametrów
+     */
+    public Map<String, Object> getAllParameters() {
+        return parameters;
+    }
 }

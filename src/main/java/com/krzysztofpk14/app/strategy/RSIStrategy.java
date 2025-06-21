@@ -4,6 +4,7 @@ import com.krzysztofpk14.app.bossaapi.client.BossaApiClient;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.gui.TradingAppGUI;
 
 import java.util.HashMap; 
 import java.util.LinkedList;
@@ -74,11 +75,7 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
         String symbol = marketData.getInstrument().getSymbol();
         
         // Pobierz cenę z danych rynkowych
-        double price = getLastPrice(marketData);
-        
-        if (price <= 0) {
-            return;  // Brak poprawnej ceny
-        }
+        double price = getLastPrice(marketData);    
         
         // Dodaj cenę do bufora
         LinkedList<Double> buffer = priceBuffers.get(symbol);
@@ -99,7 +96,6 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
             double rsi = calculateRSI(buffer);
             lastRSI.put(symbol, rsi);
             
-            System.out.println(symbol + " RSI: " + rsi);
             
             // Generuj sygnały na podstawie RSI
             boolean hasPosition = inPosition.getOrDefault(symbol, false);
@@ -165,11 +161,11 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
         
         int quantity = calculateQuantity(price);
         
-        System.out.println("Generowanie sygnału BUY dla " + symbol + " po cenie " + price + ", ilość: " + quantity);
+        System.out.println("Generowanie sygnalu BUY dla " + symbol + " po cenie " + price + ", ilość: " + quantity);
         
         // Tworzenie zlecenia kupna
         OrderRequest order = new OrderRequest();
-        order.setClientOrderId("ORD" + orderIdCounter.incrementAndGet());
+        order.setClientOrderId("RSI-ORD" + orderIdCounter.incrementAndGet());
         order.setSide(OrderRequest.BUY);
         
         // Ustawienie instrumentu
@@ -181,6 +177,7 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
         OrderRequest.OrderQuantity orderQuantity = new OrderRequest.OrderQuantity();
         orderQuantity.setQuantity(String.valueOf(quantity));
         order.setOrderQuantity(orderQuantity);
+        order.setPrice(String.valueOf(price));
         
         // Ustawienie typu zlecenia (rynkowe)
         order.setOrderType(OrderRequest.MARKET);
@@ -207,7 +204,7 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
         
         // Tworzenie zlecenia zamykającego pozycję
         OrderRequest order = new OrderRequest();
-        order.setClientOrderId("CLOSE" + orderIdCounter.incrementAndGet());
+        order.setClientOrderId("RSI-ORD-CLOSE" + orderIdCounter.incrementAndGet());
         
         // Ustawienie przeciwnego kierunku do pozycji
         if (position.getDirection() == Position.Direction.LONG) {
@@ -227,7 +224,7 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
         order.setOrderQuantity(quantity);
         
         // Ustawienie typu zlecenia (rynkowe)
-        order.setOrderType(OrderRequest.MARKET);
+        order.setOrderType(OrderRequest.MARKET); // Po każdej cenie
         order.setTimeInForce(OrderRequest.DAY);
         
         // Wysłanie zlecenia
@@ -289,5 +286,10 @@ public class RSIStrategy extends AbstractInvestmentStrategy {
     public String getDescription() {
         return "Strategia bazująca na wskaźniku RSI (Relative Strength Index). " +
                "Kupuje gdy RSI jest poniżej progu wyprzedania, sprzedaje gdy RSI jest powyżej progu wykupienia.";
+    }
+
+    @Override
+    public void setGui(TradingAppGUI gui) {
+        super.setGui(gui);
     }
 }

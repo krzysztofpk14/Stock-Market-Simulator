@@ -8,7 +8,6 @@ import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 /**
@@ -135,7 +134,6 @@ public class BossaApiConnection {
                                 ((lengthBuffer[2] & 0xFF) << 8) |
                                 (lengthBuffer[3] & 0xFF);
             
-            // System.out.println("Odczytano długość odpowiedzi: " + responseLength + " bajtów");
             
             // Sprawdź czy długość ma sens
             if (responseLength <= 0 || responseLength > 10_000_000) { // 10MB jako rozsądny limit
@@ -159,7 +157,7 @@ public class BossaApiConnection {
             
             return response;
         } catch (IOException e) {
-            System.err.println("Błąd podczas odbierania wiadomości: " + e.getMessage());
+            System.err.println("BossaApiConnection: Blad podczas odbierania wiadomosci: " + e.getMessage());
             return null; // lub można rzucić 
         }    
     }

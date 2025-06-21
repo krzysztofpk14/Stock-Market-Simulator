@@ -238,7 +238,7 @@ public class ClientSession {
         output.write(messageBytes);
         output.flush();
         
-        // System.out.println("Sesja " + sessionId + " wyslala: " + message);
+        // System.out.println("Sesja " + sessionId + " wyslala wiadomosc" + message);
     }
     
     /**

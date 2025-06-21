@@ -147,6 +147,15 @@ public class StrategyStatistics {
     public double getTotalSellVolume() {
         return totalSellVolume.get();
     }
+
+    /**
+     * Zwraca liczbę wszystkich transakcji (kupna + sprzedaży).
+     * 
+     * @return Liczba wszystkich transakcji
+     */
+    public int getTradeCount() {
+        return totalBuys.get() + totalSells.get();
+    }
     
     /**
      * Zwraca całkowitą wartość kupna.

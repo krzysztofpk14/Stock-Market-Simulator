@@ -119,7 +119,7 @@ public class Position {
      * @return Ilość instrumentu
      */
     public String getQuantity() {
-        return String.valueOf(Math.abs(this.quantity));
+        return String.valueOf((int)Math.abs(this.quantity));
     }
     
     /**

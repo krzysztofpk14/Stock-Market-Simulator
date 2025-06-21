@@ -18,4 +18,11 @@ public abstract class BaseMessage {
      * @return Łańcuch znaków określający typ wiadomości
      */
     public abstract String getMessageType();
+
+    /**
+     * Zwraca unikalny identyfikator wiadomości.
+     * 
+     * @return Łańcuch znaków z identyfikatorem wiadomości
+     */
+    public abstract String getMessageId();
 }

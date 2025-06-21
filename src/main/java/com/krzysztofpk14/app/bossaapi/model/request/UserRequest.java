@@ -85,4 +85,9 @@ public class UserRequest extends BaseMessage {
     public String getMessageType() {
         return "UserReq";
     }
+
+    @Override
+    public String getMessageId() {
+        return userReqID;
+    }
 }

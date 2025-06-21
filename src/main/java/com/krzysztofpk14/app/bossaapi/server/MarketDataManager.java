@@ -4,9 +4,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -25,6 +27,9 @@ public class MarketDataManager {
     // Mapa symulowanych cen: symbol -> cena
     private final Map<String, Double> instrumentPrices = new HashMap<>();
     
+    // Map to track symbols per request ID
+    private final Map<String, Set<String>> requestSymbols = new ConcurrentHashMap<>();
+    
     // Słuchacze zdarzeń rynkowych
     private final List<Consumer<MarketDataResponse>> marketDataListeners = new ArrayList<>();
     
@@ -41,7 +46,7 @@ public class MarketDataManager {
         instrumentPrices.put("PKN", 78.5);
         instrumentPrices.put("PZU", 33.8);
         instrumentPrices.put("CDR", 331.5);
-        instrumentPrices.put("LPP", 9120.0);
+        instrumentPrices.put("LPP", 912.0);
         instrumentPrices.put("PGE", 8.35);
         instrumentPrices.put("SPL", 216.8);
         instrumentPrices.put("DNP", 420.0);
@@ -78,27 +83,36 @@ public class MarketDataManager {
         Random random = new Random();
         
         for (Map.Entry<String, Double> entry : instrumentPrices.entrySet()) {
-            // Losowa zmiana procentowa -1% do +1%
-            double changePercent = (random.nextDouble() - 0.5) * 0.02;
+            String symbol = entry.getKey();
+            
+            // Losowa zmiana procentowa w zakresie -0.8% do +1.2%
+            double changePercent = (random.nextDouble() - 0.4) * 0.02;
             double newPrice = entry.getValue() * (1 + changePercent);
             
             // Zaokrąglenie do 2 miejsc po przecinku
             newPrice = Math.round(newPrice * 100.0) / 100.0;
-            instrumentPrices.put(entry.getKey(), newPrice);
+            instrumentPrices.put(symbol, newPrice);
             
-            // Sprawdź czy ktoś subskrybuje ten instrument
-            for (Map.Entry<String, List<ClientSession>> sub : subscriptions.entrySet()) {
-                if (!sub.getValue().isEmpty()) {
-                    // Dla uproszczenia zakładamy, że każda subskrypcja dotyczy wszystkich instrumentów
-                    // W rzeczywistej implementacji należałoby sprawdzić, których instrumentów dotyczy subskrypcja
+            // Find subscriptions for this symbol
+            for (Map.Entry<String, Set<String>> symbolEntry : requestSymbols.entrySet()) {
+                String requestId = symbolEntry.getKey();
+                Set<String> symbols = symbolEntry.getValue();
+                
+                // Check if this request has subscribed to this symbol or to all symbols
+                if (symbols.contains(symbol) || symbols.contains("ALL")) {
+                    List<ClientSession> sessions = subscriptions.get(requestId);
                     
-                    // Utwórz odpowiedź z danymi rynkowymi
-                    MarketDataResponse response = createMarketDataResponse(entry.getKey(), 
-                                                                        String.valueOf(newPrice),
-                                                                        sub.getKey());
-                    
-                    // Powiadom obserwatorów
-                    notifyMarketDataListeners(response);
+                    if (sessions != null && !sessions.isEmpty()) {
+                        // Create market data response
+                        MarketDataResponse response = createMarketDataResponse(symbol, 
+                                                                            String.valueOf(newPrice),
+                                                                            requestId);
+                        
+                        // Notify listeners
+                        notifyMarketDataListeners(response);
+                        
+
+                    }
                 }
             }
         }
@@ -232,9 +246,29 @@ public class MarketDataManager {
     public void subscribeMarketData(MarketDataRequest request, ClientSession session) {
         String requestId = request.getRequestId();
         
+        // Add session to subscriptions
         subscriptions.computeIfAbsent(requestId, k -> new ArrayList<>()).add(session);
         
-        // System.out.println("Dodano subskrypcję danych rynkowych dla requestId: " + requestId);
+        // Parse and store subscribed symbols
+        Set<String> symbols = new HashSet<>();
+        
+        if (request.getInstruments() != null) {
+            for (MarketDataRequest.InstrumentMarketDataRequest instr : request.getInstruments()) {
+                if (instr.getInstrument() != null && instr.getInstrument().getSymbol() != null) {
+                    symbols.add(instr.getInstrument().getSymbol());
+                }
+            }
+        }
+        
+        // If no specific symbols, assume ALL
+        if (symbols.isEmpty()) {
+            symbols.add("ALL");
+        }
+        
+        // Store symbols for this request
+        requestSymbols.put(requestId, symbols);
+        
+        System.out.println("Added market data subscription for requestId: " + requestId + ", symbols: " + symbols);
     }
     
     /**
@@ -244,7 +278,8 @@ public class MarketDataManager {
      */
     public void unsubscribeMarketData(String requestId) {
         subscriptions.remove(requestId);
-        // System.out.println("Usunięto subskrypcję danych rynkowych dla requestId: " + requestId);
+        requestSymbols.remove(requestId);
+        System.out.println("Removed market data subscription for requestId: " + requestId);
     }
     
     /**
@@ -253,11 +288,18 @@ public class MarketDataManager {
      * @param session Sesja klienta
      */
     public void unsubscribeAllMarketData(ClientSession session) {
-        for (List<ClientSession> sessions : subscriptions.values()) {
-            sessions.remove(session);
+        // Remove session from all subscription lists
+        for (Map.Entry<String, List<ClientSession>> entry : subscriptions.entrySet()) {
+            List<ClientSession> sessions = entry.getValue();
+            boolean removed = sessions.remove(session);
+            
+            // If this was the last session for this request, clean up request symbols too
+            if (removed && sessions.isEmpty()) {
+                requestSymbols.remove(entry.getKey());
+            }
         }
         
-        // Usuń puste listy
+        // Clean up empty subscription entries
         subscriptions.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
     

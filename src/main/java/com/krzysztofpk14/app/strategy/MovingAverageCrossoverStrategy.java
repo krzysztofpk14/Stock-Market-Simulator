@@ -4,6 +4,7 @@ import com.krzysztofpk14.app.bossaapi.client.BossaApiClient;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.gui.TradingAppGUI;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -120,7 +121,7 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
             } else if (shortSMA < longSMA) {
                 currentSignal = Signal.SELL;
             }
-            
+
             // Sprawdź czy doszło do zmiany sygnału
             Signal previousSignal = lastSignals.getOrDefault(symbol, Signal.NONE);
             if (currentSignal != previousSignal) {
@@ -198,7 +199,7 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
         
         // Tworzenie zlecenia kupna
         OrderRequest order = new OrderRequest();
-        order.setClientOrderId("ORD" + orderIdCounter.incrementAndGet());
+        order.setClientOrderId("MAC-ORD-LONG" + orderIdCounter.incrementAndGet());
         order.setSide(OrderRequest.BUY);
         
         // Ustawienie instrumentu
@@ -237,7 +238,7 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
         
         // Tworzenie zlecenia sprzedaży
         OrderRequest order = new OrderRequest();
-        order.setClientOrderId("ORD" + orderIdCounter.incrementAndGet());
+        order.setClientOrderId("MAC-ORD-SHORT" + orderIdCounter.incrementAndGet());
         order.setSide(OrderRequest.SELL);
         
         // Ustawienie instrumentu
@@ -249,6 +250,7 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
         OrderRequest.OrderQuantity orderQuantity = new OrderRequest.OrderQuantity();
         orderQuantity.setQuantity(String.valueOf(quantity));
         order.setOrderQuantity(orderQuantity);
+        order.setPrice(String.valueOf(price));
         
         // Ustawienie typu zlecenia (rynkowe)
         order.setOrderType(OrderRequest.MARKET);
@@ -269,13 +271,13 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
         if (position == null) {
             return;
         }
-        
+
         System.out.println("Zamykanie pozycji dla " + symbol + ", kierunek: " + position.getDirection() + 
                           ", ilość: " + position.getQuantity());
         
         // Tworzenie zlecenia zamykającego pozycję
         OrderRequest order = new OrderRequest();
-        order.setClientOrderId("CLOSE" + orderIdCounter.incrementAndGet());
+        order.setClientOrderId("MAC-CLOSE" + orderIdCounter.incrementAndGet());
         
         // Ustawienie przeciwnego kierunku do pozycji
         if (position.getDirection() == Position.Direction.LONG) {
@@ -293,9 +295,10 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
         OrderRequest.OrderQuantity quantity = new OrderRequest.OrderQuantity();
         quantity.setQuantity(position.getQuantity());
         order.setOrderQuantity(quantity);
+        order.setPrice("0");
         
         // Ustawienie typu zlecenia (rynkowe)
-        order.setOrderType(OrderRequest.MARKET);
+        order.setOrderType(OrderRequest.MARKET); // Po każdej cenie
         order.setTimeInForce(OrderRequest.DAY);
         
         // Wysłanie zlecenia
@@ -358,5 +361,10 @@ public class MovingAverageCrossoverStrategy extends AbstractInvestmentStrategy {
     public String getDescription() {
         return "Strategia bazująca na przecięciu krótkoterminowej i długoterminowej średniej kroczącej (SMA). " +
                "Kupuje gdy krótka MA przebija długą MA od dołu, sprzedaje w przeciwnym przypadku.";
+    }
+
+    @Override
+    public void setGui(TradingAppGUI gui) {
+        super.setGui(gui);
     }
 }

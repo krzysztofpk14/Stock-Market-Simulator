@@ -32,6 +32,7 @@ public class BossaApiClient {
     private final Map<String, CompletableFuture<ExecutionReport>> orderResponses = new ConcurrentHashMap<>();
     private final Map<String, CompletableFuture<MarketDataResponse>> marketDataFutures = new ConcurrentHashMap<>();
     private final Map<String, CompletableFuture<ExecutionReport>> orderFutures = new ConcurrentHashMap<>();
+    private final Map<String, CompletableFuture<SecurityList>> securityListFutures = new ConcurrentHashMap<>();
     
     private final Map<String, Consumer<MarketDataResponse>> marketDataHandlers = new ConcurrentHashMap<>();
     private final Map<String, Consumer<ExecutionReport>> executionReportHandlers = new ConcurrentHashMap<>();
@@ -54,6 +55,12 @@ public class BossaApiClient {
      * @throws IOException Jeśli wystąpi błąd połączenia
      */
     public void connect(String host, int port) throws IOException {
+        // Don't reconnect if already connected
+        if (isConnected()) {
+            System.out.println("Already connected to " + host + ":" + port);
+            return;
+        }
+        
         connection.connect(host, port);
         connection.startReceivingAsync(this::handleMessage);
     }
@@ -101,7 +108,7 @@ public class BossaApiClient {
         UserRequest request = new UserRequest(requestId, username, password);
         String requestXml = FixmlGenerator.generateXml(request);
         String response = connection.sendAndReceive(requestXml);
-        System.out.println("Odpowiedź: " + response);
+        // System.out.println("Odpowiedz: " + response);
 
         if (response != null) {
             FixmlMessage fixmlMessage = FixmlParser.parse(response);
@@ -234,7 +241,7 @@ public class BossaApiClient {
     /** 
      *  Wysyła żądanie SecurityListRequest do serwera.
      */
-    public SecurityList requestSecurityList(SecurityListRequest request) throws IOException, JAXBException {
+    public CompletableFuture<SecurityList> requestSecurityList(SecurityListRequest request) throws IOException, JAXBException {
         if (!isLoggedIn()) {
             throw new IllegalStateException("Uzytkownik nie jest zalogowany");
         }
@@ -245,25 +252,13 @@ public class BossaApiClient {
             request.setRequestId(requestId);
         }
 
-        // marketDataHandlers.put(requestId, handler);
-        System.out.println("Wysyłanie żądania danych rynkowych: " + requestId);
+        CompletableFuture<SecurityList> future = new CompletableFuture<>();
+        securityListFutures.put(requestId, future);
 
-        String requestXml = FixmlGenerator.generateXml(request);
-        String response = connection.sendAndReceive(requestXml);
-        System.out.println("Odpowiedź: " + response);
+        sendMessage(request);
 
-        if (response != null) {
-            FixmlMessage fixmlMessage = FixmlParser.parse(response);
-            if (fixmlMessage != null && fixmlMessage.getMessage() instanceof SecurityList) {
-                SecurityList securityListResponse = (SecurityList) fixmlMessage.getMessage();
-                return securityListResponse;
-            } else {
-                System.err.println("Otrzymano nieprawidłową odpowiedź: " + response);
-            }
-        } else {
-            System.err.println("Brak odpowiedzi z serwera");
-        }
-        return null;
+ 
+        return future;
     }
     
     /**
@@ -271,8 +266,8 @@ public class BossaApiClient {
      * 
      * @param handler Funkcja obsługująca raporty wykonania
      */
-    public void registerExecutionReportHandler(Consumer<ExecutionReport> handler) {
-        executionReportHandlers.put("default", handler);
+    public void registerExecutionReportHandler(String key, Consumer<ExecutionReport> handler) {
+        executionReportHandlers.put(key, handler);
     }
     
         /**
@@ -280,8 +275,8 @@ public class BossaApiClient {
      * 
      * @param handler Funkcja obsługująca raporty wykonania
      */
-    public void registerMarketDataHandler(Consumer<MarketDataResponse> handler) {
-        marketDataHandlers.put("default", handler);
+    public void registerMarketDataHandler(String key, Consumer<MarketDataResponse> handler) {
+        marketDataHandlers.put(key, handler);
     }
 
     /**
@@ -316,8 +311,11 @@ public class BossaApiClient {
                 handleExecutionReport((ExecutionReport) baseMessage);
             } else if (baseMessage instanceof MarketDataResponse) {
                 handleMarketDataResponse((MarketDataResponse) baseMessage);
+            } else if (baseMessage instanceof SecurityList) {
+                handleSecurityListResponse((SecurityList) baseMessage);
             } else if (baseMessage instanceof BusinessMessageReject) {
             handleBusinessMessageReject((BusinessMessageReject) baseMessage);
+
         }
         } catch (JAXBException e) {
             System.err.println("Błąd podczas parsowania wiadomości FIXML: " + e);
@@ -359,6 +357,7 @@ public class BossaApiClient {
         CompletableFuture<ExecutionReport> future = orderResponses.get(clientOrderId);
         if (future != null) {
             future.complete(report);
+            System.out.println("Future completed for order: " + clientOrderId);
             
             // Usuwamy tylko dla zakończonych zleceń
             String execType = report.getExecutionType();
@@ -370,6 +369,7 @@ public class BossaApiClient {
         
         // Powiadamiamy ogólnych obserwatorów raportów wykonania
         executionReportHandlers.values().forEach(handler -> handler.accept(report));
+        // System.out.println("Execution report handled for order: " + clientOrderId);
     }
     
     /**
@@ -379,10 +379,41 @@ public class BossaApiClient {
      */
     private void handleMarketDataResponse(MarketDataResponse response) {
         String requestId = response.getRequestId();
-        Consumer<MarketDataResponse> handler = marketDataHandlers.get(requestId);
+
+        //Old code
+        // Consumer<MarketDataResponse> handler = marketDataHandlers.get(requestId);
         
-        if (handler != null) {
-            handler.accept(response);
+        // if (handler != null) {
+        //     handler.accept(response);
+        // }
+
+        //New code
+        CompletableFuture<MarketDataResponse> future = marketDataFutures.remove(requestId);
+        if (future != null) {
+            future.complete(response);
+        }
+        
+        // Notify all handlers (including the default one)
+        marketDataHandlers.values().forEach(handler -> {
+            if (handler != null) {
+                handler.accept(response);
+            }
+        });
+    }
+
+    /**
+     * Obsługuje odpowiedź z listą instrumentów.
+     * 
+     * @param response Odpowiedź z listą instrumentów
+     */
+    private void handleSecurityListResponse(SecurityList response) {
+        String requestId = response.getRequestId();
+        CompletableFuture<SecurityList> future = securityListFutures.remove(requestId);
+        
+        if (future != null) {
+            future.complete(response);
+        } else {
+            System.err.println("Brak oczekującego Future dla SecurityList z requestId: " + requestId);
         }
     }
 

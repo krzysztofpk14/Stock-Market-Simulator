@@ -138,6 +138,11 @@ public class OrderRequest extends BaseMessage {
     public String getMessageType() {
         return "Order";
     }
+
+    @Override
+    public String getMessageId() {
+        return clientOrderId;
+    }
     
     // Klasy wewnętrzne dla elementów podrzędnych
     @XmlAccessorType(XmlAccessType.FIELD)

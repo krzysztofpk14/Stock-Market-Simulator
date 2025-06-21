@@ -70,6 +70,11 @@ public class MarketDataResponse extends BaseMessage {
     public String getMessageType() {
         return "MktDataSnap";
     }
+
+    @Override
+    public String getMessageId() {
+        return requestId;
+    }
     
     // Klasy wewnętrzne dla elementów podrzędnych
     @XmlAccessorType(XmlAccessType.FIELD)

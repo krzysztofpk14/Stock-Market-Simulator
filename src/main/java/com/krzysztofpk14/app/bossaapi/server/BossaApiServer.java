@@ -6,9 +6,6 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.krzysztofpk14.app.bossaapi.model.base.BaseMessage;
-import com.krzysztofpk14.app.bossaapi.model.base.FixmlMessage;
-
 /**
  * Serwer bossaAPI obsługujący połączenia z klientami.
  */
@@ -33,6 +30,7 @@ public class BossaApiServer {
         this.orderManager = new OrderManager();
         this.marketDataManager = new MarketDataManager();
         this.securityManager = new SecurityManager();
+        this.orderManager.setMarketDataManager(this.marketDataManager);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.krzysztofpk14.app.strategy;
 import com.krzysztofpk14.app.bossaapi.client.BossaApiClient;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.gui.TradingAppGUI;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -17,6 +18,7 @@ public class StrategyManager {
     
     private final BossaApiClient client;
     private final List<InvestmentStrategy> strategies = new CopyOnWriteArrayList<>();
+    private TradingAppGUI gui;
     
     /**
      * Konstruktor.
@@ -27,8 +29,8 @@ public class StrategyManager {
         this.client = client;
         
         // Rejestruj obserwatorów zdarzeń
-        client.registerMarketDataHandler(this::distributeMarketData);
-        client.registerExecutionReportHandler(this::distributeExecutionReport);
+        client.registerMarketDataHandler("strategyManager", this::distributeMarketData);
+        client.registerExecutionReportHandler("strategyManager", this::distributeExecutionReport);
     }
     
     /**
@@ -147,6 +149,13 @@ public class StrategyManager {
             System.out.println("Statystyki:");
             strategy.displayStatistics();
             System.out.println("--------------------------------------------------");
+        }
+    }
+
+    public void setGui(TradingAppGUI gui) {
+        this.gui = gui;
+        for (InvestmentStrategy strategy : strategies) {
+            strategy.setGui(gui);
         }
     }
 }

@@ -5,6 +5,7 @@ import com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest;
 import com.krzysztofpk14.app.bossaapi.model.request.OrderRequest;
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.gui.TradingAppGUI;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 
 /**
  * Abstrakcyjna klasa bazowa dla wszystkich strategii inwestycyjnych.
@@ -43,6 +45,8 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
     
     // Licznik wygenerowanych ID zleceń
     protected final AtomicLong orderIdCounter = new AtomicLong(1);
+
+    private TradingAppGUI gui;
     
     /**
      * Konstruktor.
@@ -130,12 +134,18 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
                 try {
                     // Tworzenie żądania subskrypcji
                     MarketDataRequest request = new MarketDataRequest();
-                    request.setRequestId("MDR" + orderIdCounter.incrementAndGet());
+                    request.setRequestId("MDR" + getUUID());
                     request.setSubscriptionRequestType(MarketDataRequest.SUBSCRIBE);
                     request.addInstrument(symbol);
                     
                     // Wysłanie żądania
                     apiClient.subscribeMarketData(request);
+
+                    // Zapisanie żądania do logów (opcjonalnie)
+                    if (gui != null) {
+                        gui.apiService.logRequest(request);
+                    }
+                    System.out.println(request);
                     
                 } catch (Exception e) {
                     System.err.println("Błąd podczas subskrypcji danych rynkowych dla " + symbol + ": " + e.getMessage());
@@ -148,8 +158,7 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
      * Anuluje subskrypcję danych rynkowych.
      */
     protected void unsubscribeFromMarketData() {
-        // Implementacja anulowania subskrypcji
-        // ...
+        // TODO: Implementacja anulowania subskrypcji
     }
     
     /**
@@ -162,7 +171,7 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
             try {
                 // Tworzenie zlecenia zamykającego pozycję
                 OrderRequest closeOrder = new OrderRequest();
-                closeOrder.setClientOrderId("CLOSE" + orderIdCounter.incrementAndGet());
+                closeOrder.setClientOrderId("CLOSE-ALL" + getUUID());
                 
                 // Ustawienie przeciwnego kierunku do pozycji
                 if (position.getDirection() == Position.Direction.LONG) {
@@ -202,6 +211,10 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
         // Aktualizacja ostatnich danych rynkowych
         if (marketData.getInstrument() != null) {
             String symbol = marketData.getInstrument().getSymbol();
+            // Sprawdzenie czy dane rynkowe dotyczą instrumentu skonfigurowanego w strategii
+            if (!parameters.getInstruments().contains(symbol)) {
+                return; // Ignorowanie danych rynkowych dla nieobsługiwanych instrumentów
+            }
             lastMarketData.put(symbol, marketData);
             
             // Wywołanie metody przetwarzającej dane rynkowe specyficznej dla konkretnej strategii
@@ -317,12 +330,16 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
         try {
             // Generowanie ID zlecenia jeśli nie zostało ustawione
             if (order.getClientOrderId() == null || order.getClientOrderId().isEmpty()) {
-                order.setClientOrderId("ORD" + orderIdCounter.incrementAndGet());
+                order.setClientOrderId("StrategyORD" + getUUID());
             }
             
             // Wysłanie zlecenia
             apiClient.sendOrder(order);
-            System.out.println("Zlecenie wysłane: " + order.getClientOrderId() + " - " + order.getInstrument().getSymbol() + " - " + order.getSide() + " " + order.getOrderQuantity().getQuantity() + " @ " + order.getPrice());
+            // Logowanie zlecenia (opcjonalnie)
+            if (gui != null) {
+                gui.apiService.logRequest(order);
+            }
+            // System.out.println("Zlecenie wysłane: " + order.getClientOrderId() + " - " + order.getInstrument().getSymbol() + " - " + order.getSide() + " " + order.getOrderQuantity().getQuantity() + " @ " + order.getPrice());
             
             // Zapisanie ID zlecenia
             orderIds.add(order.getClientOrderId());
@@ -338,6 +355,22 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
     public StrategyStatus getStatus() {
         return status;
     }
+
+    @Override
+    public String getStatusString() {
+        switch (status) {
+            case INITIALIZED:
+                return "Innitiated";
+            case RUNNING:
+                return "Working";
+            case STOPPING:
+                return "Stopping";
+            case STOPPED:
+                return "Stopped";
+            default:
+                return "Unknown status";
+        }
+    }
     
     @Override
     public StrategyStatistics getStatistics() {
@@ -349,4 +382,38 @@ public abstract class AbstractInvestmentStrategy implements InvestmentStrategy {
         System.out.println(statistics.displayStatistics());
     }
 
+    @Override
+    public String getParametersAsString() {
+        StringBuilder parametersString = new StringBuilder();
+        parametersString.append("Strategy Parameters:");
+        Map<String, Object> parametersMap = parameters.getAllParameters();
+        for (Map.Entry<String, Object> entry : parametersMap.entrySet()) {
+            parametersString.append("\n").append(entry.getKey()).append(": ").append(entry.getValue());
+        }
+
+        return parametersString.toString();
+    }   
+
+    @Override
+    public String getInstruments() {
+        StringBuilder instruments = new StringBuilder();
+        if (parameters.getInstruments() != null && !parameters.getInstruments().isEmpty()) {
+            for (String symbol : parameters.getInstruments()) {
+                instruments.append(symbol).append("\n");
+            }
+        } else {
+            instruments.append("Brak instrumentów");
+        }
+
+        return instruments.toString();
+    }
+
+    private UUID getUUID() {
+        return UUID.randomUUID();
+    }
+
+    @Override
+    public void setGui(TradingAppGUI gui) {
+        this.gui = gui;
+    }
 }

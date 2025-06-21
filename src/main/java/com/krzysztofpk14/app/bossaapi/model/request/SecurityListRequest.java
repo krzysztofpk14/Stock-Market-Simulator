@@ -24,20 +24,6 @@ public class SecurityListRequest extends BaseMessage {
     
     @XmlElement(name = "InstrmtLegGrp")
     private InstrumentLegGroup instrumentLegGroup;
-    
-    // // Stałe dla typów żądań
-    // public static final String SYMBOL = "0";            // Symbol
-    // public static final String SECURITYID_SOURCE = "1"; // SecurityID + SecurityIDSource
-    // public static final String PRODUCT = "2";           // Product
-    // public static final String CFICODE = "3";           // CFICode
-    // public static final String SECURITYTYPE = "4";      // SecurityType
-    // public static final String MARKETID_EXCHANGE = "5"; // MarketID + MarketSegmentID
-    // public static final String ALL = "6";               // Wszystkie bezpieczeństwa
-    
-    // // Typy subskrypcji
-    // public static final String SNAPSHOT = "0";         // Tylko raz (snapshot)
-    // public static final String SUBSCRIBE = "1";        // Subskrypcja (otrzymuj aktualizacje)
-    // public static final String UNSUBSCRIBE = "2";      // Anuluj subskrypcję
 
     // Stałe dla SecurityListRequestType
     public static final String ONE_INSTRMNT = "0"; // Żądanie pojedynczego instrumentu
@@ -126,6 +112,11 @@ public class SecurityListRequest extends BaseMessage {
     @Override
     public String getMessageType() {
         return "SecListReq";
+    }
+
+    @Override
+    public String getMessageId() {
+        return requestId;
     }
     
     /**

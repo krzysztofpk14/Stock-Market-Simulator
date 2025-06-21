@@ -14,7 +14,7 @@ public class UserResponse extends BaseMessage {
     private String userReqID;
     
     @XmlAttribute(name = "UserStat")
-    private String userStatus;  // 1=zalogowany, 2=wylogowany, 3=użytkownik nie istnieje, 4=błędne hasło, 5=inwestor offline, 6= inne, 7 =nol offline
+    private String userStatus; 
     
     @XmlAttribute(name = "UserStatText")
     private String userStatusText;
@@ -22,7 +22,7 @@ public class UserResponse extends BaseMessage {
     @XmlAttribute(name = "Username")
     private String username;
 
-    @XmlAttribute(name = "MktDepth") //int, Ilość ofert, 0 -> 5 ofert (rezerwa na cały arkusz), 1-> 1 oferta, 5-> 5 ofert
+    @XmlAttribute(name = "MktDepth")
     private String mktDepth;
     
     // Stałe dla statusów
@@ -87,6 +87,11 @@ public class UserResponse extends BaseMessage {
     @Override
     public String getMessageType() {
         return "UserRsp";
+    }
+
+    @Override
+    public String getMessageId() {
+        return userReqID;
     }
     
     /**

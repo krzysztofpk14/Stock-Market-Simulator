@@ -2,6 +2,7 @@ package com.krzysztofpk14.app.strategy;
 
 import com.krzysztofpk14.app.bossaapi.model.response.ExecutionReport;
 import com.krzysztofpk14.app.bossaapi.model.response.MarketDataResponse;
+import com.krzysztofpk14.app.gui.TradingAppGUI;
 
 /**
  * Interfejs bazowy dla wszystkich strategii inwestycyjnych.
@@ -59,6 +60,13 @@ public interface InvestmentStrategy {
      * @return Status strategii
      */
     StrategyStatus getStatus();
+
+    /**
+     * Zwraca status strategii jako łańcuch znaków.
+     * 
+     * @return Łańcuch znaków reprezentujący status strategii
+     */
+    String getStatusString();
     
     /**
      * Zwraca bieżące statystyki strategii.
@@ -71,4 +79,28 @@ public interface InvestmentStrategy {
      * Wyświetla statystyki strategii w konsoli.
      */
     void displayStatistics();
+
+
+    /**
+     * Zwraca parametry strategii jako łańcuch znaków.
+     * 
+     * @return Łańcuch znaków z parametrami strategii
+     */
+    String getParametersAsString();
+
+    /**
+     * Zwraca Instrumenty w strategii
+     * 
+     * @return String zawierający instrumenty strategii
+     */
+    String getInstruments();
+
+    /**
+     * Ustawia GUI aplikacji handlowej.
+     * 
+     * @param gui GUI aplikacji handlowej
+     */
+    void setGui(TradingAppGUI gui);
+
+
 }

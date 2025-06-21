@@ -81,6 +81,11 @@ public class MarketDataRequest extends BaseMessage {
     public String getMessageType() {
         return "MktDataReq";
     }
+
+    @Override
+    public String getMessageId() {
+        return requestId;
+    }
     
     // Klasy wewnętrzne
     @XmlAccessorType(XmlAccessType.FIELD)
