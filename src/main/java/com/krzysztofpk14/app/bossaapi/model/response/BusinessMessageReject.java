@@ -73,13 +73,4 @@ public class BusinessMessageReject extends BaseMessage {
     public String getMessageId() {
         return "None";
     }
-
-    // @Override
-    // public String toString() {
-    //     return "BusinessMessageReject{" +
-    //             "refMsgType='" + refMsgType + '\'' +
-    //             ", businessRejectReason='" + businessRejectReason + '\'' +
-    //             ", text='" + text + '\'' +
-    //             '}';
-    // }
 }

@@ -85,8 +85,8 @@ public class MarketDataManager {
         for (Map.Entry<String, Double> entry : instrumentPrices.entrySet()) {
             String symbol = entry.getKey();
             
-            // Losowa zmiana procentowa w zakresie -0.8% do +1.2%
-            double changePercent = (random.nextDouble() - 0.4) * 0.02;
+            // Losowa zmiana procentowa w zakresie -1.0% do +1.0%
+            double changePercent = (random.nextDouble() - 0.5) * 0.02;
             double newPrice = entry.getValue() * (1 + changePercent);
             
             // Zaokrąglenie do 2 miejsc po przecinku
