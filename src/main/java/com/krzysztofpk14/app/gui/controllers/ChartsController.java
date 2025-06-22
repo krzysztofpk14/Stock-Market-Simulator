@@ -11,11 +11,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.util.StringConverter;
 
 import java.util.HashMap;
@@ -32,10 +30,6 @@ public class ChartsController {
     private ComboBox<String> symbolComboBox;
     private ObservableList<String> availableSymbols = FXCollections.observableArrayList();
     private String currentSymbol = "ALL"; // "ALL" represents showing all symbols
-    private Slider timeRangeSlider;
-    private Label rangeLabel;
-    private final int MAX_DATA_POINTS = 1000; // Maximum number of data points to store
-    private final int DEFAULT_VISIBLE_POINTS = 100; // Default number of points to display
     
     public ChartsController(TradingAppModel model) {
         this.model = model;

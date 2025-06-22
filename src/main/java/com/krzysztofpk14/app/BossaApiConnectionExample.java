@@ -1,7 +1,6 @@
 package com.krzysztofpk14.app;
 
 import com.krzysztofpk14.app.bossaapi.client.BossaApiClient;
-import com.krzysztofpk14.app.bossaapi.model.request.MarketDataRequest;
 import com.krzysztofpk14.app.bossaapi.model.response.UserResponse;
 import com.krzysztofpk14.app.bossaapi.server.BossaApiServer;
 
